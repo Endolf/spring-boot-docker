@@ -1,5 +1,7 @@
 ### Credits
-Based on a number of resources including [SpringIO Spring Boot with Docker](https://spring.io/guides/gs/spring-boot-docker/)
+Based on a number of resources including 
+* [SpringIO Spring Boot with Docker](https://spring.io/guides/gs/spring-boot-docker/)
+* [Compose and Wordpress](https://docs.docker.com/compose/wordpress/)
 
 ### Run
 ```
