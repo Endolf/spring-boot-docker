@@ -1,0 +1,27 @@
+
+version: '2'
+
+services:
+   db:
+     image: mariadb:10.1
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: spring-boot-docker
+       MYSQL_DATABASE: spring-boot-docker
+       MYSQL_USER: spring-boot-docker
+       MYSQL_PASSWORD: spring-boot-docker
+
+   @project.artifactId@:
+     depends_on:
+       - db
+     image: @docker.image.prefix@/@project.artifactId@:latest
+     ports:
+       - "18080:8080"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_PASSWORD: spring-boot-docker
+volumes:
+    db_data:
