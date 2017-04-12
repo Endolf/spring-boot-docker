@@ -11,8 +11,16 @@ docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-dock
 
 To access the messages in the database visit [http://localhost:18080/messages](http://localhost:18080/messages)
 
-To clean up afterwards
+### Cleanup
+To stop the containers
 ```
 docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-docker stop
+```
+To remove the containers
+```
 docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-docker rm -f
+```
+To remove the containers and delete the network and volume (db data)
+```
+docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-docker down -v
 ```
