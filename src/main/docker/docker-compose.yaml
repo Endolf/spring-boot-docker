@@ -8,10 +8,10 @@ services:
        - db_data:/var/lib/mysql
      restart: always
      environment:
-       MYSQL_ROOT_PASSWORD: spring-boot-docker
-       MYSQL_DATABASE: spring-boot-docker
-       MYSQL_USER: spring-boot-docker
-       MYSQL_PASSWORD: spring-boot-docker
+       MYSQL_ROOT_PASSWORD: rootdbsecret
+       MYSQL_DATABASE: mydb
+       MYSQL_USER: dbuser
+       MYSQL_PASSWORD: secret
 
    @project.artifactId@:
      depends_on:
@@ -21,7 +21,11 @@ services:
        - "18080:8080"
      restart: always
      environment:
-       WORDPRESS_DB_HOST: db:3306
-       WORDPRESS_DB_PASSWORD: spring-boot-docker
+       SPRING_PROFILES_ACTIVE: production
+       DB_URI: jdbc:mariadb://db:3306/mydb
+       DB_USER: dbuser
+       DB_PASSWORD: secret
+       DB_DRIVER: org.mariadb.jdbc.Driver
+       DB_DIALECT: org.hibernate.dialect.MySQL5InnoDBDialect
 volumes:
     db_data:
