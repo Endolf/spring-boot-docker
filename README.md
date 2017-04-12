@@ -9,6 +9,5 @@ docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-dock
 To clean up afterwards
 ```
 docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-docker stop
+docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-docker rm -f
 ```
-
-
