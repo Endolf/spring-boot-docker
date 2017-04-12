@@ -8,6 +8,9 @@ Based on a number of resources including
 mvn clean package
 docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-docker up -d
 ```
+
+To access the messages in the database visit [http://localhost:18080/messages](http://localhost:18080/messages)
+
 To clean up afterwards
 ```
 docker-compose -f target/docker-ready/docker-compose.yaml -p gs-spring-boot-docker stop
