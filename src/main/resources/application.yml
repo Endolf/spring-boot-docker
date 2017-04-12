@@ -5,7 +5,8 @@ spring:
     password:
     driverclassName: org.h2.Driver
 
-  jpa.hibernate.ddl-auto: create-drop
+  jpa.hibernate.ddl-auto: update
+
 ---
 
 spring:

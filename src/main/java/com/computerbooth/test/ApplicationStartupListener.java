@@ -21,7 +21,15 @@ public class ApplicationStartupListener implements ApplicationListener<Applicati
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        logger.info("Application started");
-        messageRepository.save(new Message(Instant.now(), "Application started: " + event.toString()));
+        String messageText = new StringBuilder()
+                .append("Application started: \"")
+                .append(event.getApplicationContext().getId())
+                .append("\" at ")
+                .append(event.getTimestamp())
+                .append(" by ")
+                .append(event.getSource())
+                .toString();
+        logger.info(messageText);
+        messageRepository.save(new Message(Instant.now(), messageText));
     }
 }
