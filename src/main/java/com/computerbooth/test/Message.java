@@ -13,10 +13,11 @@ import java.util.UUID;
 public class Message implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(updatable = false, nullable = false)
     private UUID id;
-    @Column(nullable = false)
+    @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP(3)")
     private Instant timestamp;
-    @Column(nullable = false)
+    @Column(updatable = false, nullable = false)
     private String message;
 
     protected Message() {}
