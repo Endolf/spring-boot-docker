@@ -17,7 +17,7 @@ kind: ReplicationController
 metadata:
   name: @project.artifactId@
 spec:
-  replicas: 1
+  replicas: 3
   selector:
       app: @project.artifactId@
       tier: web
