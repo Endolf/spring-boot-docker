@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  labels:
+    app: mariadb
+    tier: sql
+spec:
+  ports:
+    - port: 3306
+      name: mariadbsql
+  selector:
+    app: mariadb
+  clusterIP: None
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: mariadb
+spec:
+  replicas: 1
+  selector:
+      app: mariadb
+      tier: sql
+  template:
+    metadata:
+      labels:
+        app: mariadb
+        tier: sql
+    spec:
+      containers:
+        - image: mariadb:10.1
+          name: mariadb
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_USER
+              value: dbuser
+            - name: MYSQL_PASSWORD
+              value: secret
+            - name: MYSQL_ROOT_PASSWORD
+              value: rootdbsecret
+            - name: MYSQL_DATABASE
+              value: mydb
