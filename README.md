@@ -22,8 +22,9 @@ After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` 
 To access the app visit the url specified by ```minikube service gs-spring-boot-docker --url```, add ```/messages``` to the end to see the messages.
 
 ### Cleanup
-```
-kubectl delete -f target/kubernetes/app.yaml
-kubectl delete -f target/kubernetes/mariadb.yaml
-```
+* Delete the app ```kubectl delete -f target/kubernetes/app.yaml```
+* Delete the database nodes ```kubectl delete -f target/kubernetes/mariadb.yaml```
+
 then ```kubectl get all,endpoints,pvc,pv``` to confirm.
+
+To delete the persistent storage ```kubectl delete -f target/kubernetes/local-storage.yaml``` 
