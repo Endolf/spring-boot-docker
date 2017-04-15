@@ -14,6 +14,19 @@ spec:
   clusterIP: None
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pv-claim
+  labels:
+    app: mariadb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
 kind: ReplicationController
 metadata:
   name: mariadb
@@ -33,6 +46,9 @@ spec:
           name: mariadb
           ports:
             - containerPort: 3306
+          volumeMounts:
+            - name: db-persistent-storage
+              mountPath: /var/lib/mysql
           env:
             - name: MYSQL_USER
               value: dbuser
@@ -42,3 +58,7 @@ spec:
               value: rootdbsecret
             - name: MYSQL_DATABASE
               value: mydb
+      volumes:
+        - name: db-persistent-storage
+          persistentVolumeClaim:
+            claimName: db-pv-claim
