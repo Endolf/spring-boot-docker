@@ -4,6 +4,8 @@ metadata:
   name: @project.artifactId@
   labels:
     app: @project.artifactId@
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   ports:
     - port: 8080

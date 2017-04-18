@@ -13,28 +13,13 @@ spec:
     app: mariadb
   clusterIP: None
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: db-pv-claim
-  labels:
-    app: mariadb
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
-kind: ReplicationController
+apiVersion: apps/v1beta1
+kind: StatefulSet
 metadata:
   name: mariadb
 spec:
+  serviceName: "mariadb"
   replicas: 1
-  selector:
-      app: mariadb
-      tier: sql
   template:
     metadata:
       labels:
@@ -62,3 +47,12 @@ spec:
         - name: db-persistent-storage
           persistentVolumeClaim:
             claimName: db-pv-claim
+  volumeClaimTemplates:
+    - metadata:
+        name: db-pv-claim
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
