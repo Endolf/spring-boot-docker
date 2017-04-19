@@ -18,10 +18,17 @@ After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` 
 * To create the persistent storage ```kubectl create -f target/kubernetes/local-storage.yaml```
 * To deploy the database ```kubectl create -f target/kubernetes/mariadb.yaml```
 * To deploy the application ```kubectl create -f target/kubernetes/app.yaml```
+* To deploy the application service ```kubectl create -f target/kubernetes/app-service.yaml```
 
 To access the app visit the url specified by ```minikube service gs-spring-boot-docker --url```, add ```/messages``` to the end to see the messages.
 
+### Redeploy
+* Build the new version ```mvn clean package```
+* Delete the old app ```kubectl delete -f target/kubernetes/app.yaml```
+* Deploy the new version ```kubectl create -f target/kubernetes/app.yaml```
+
 ### Cleanup
+* Delete the app service ```kubectl delete -f target/kubernetes/app-service.yaml```
 * Delete the app ```kubectl delete -f target/kubernetes/app.yaml```
 * Delete the database nodes ```kubectl delete -f target/kubernetes/mariadb.yaml```
 
