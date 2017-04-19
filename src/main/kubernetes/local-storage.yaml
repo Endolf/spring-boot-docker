@@ -11,4 +11,4 @@ spec:
     - ReadWriteOnce
   storageClassName: standard
   hostPath:
-    path: /var/lib/kubernetes/data/pv-1
+    path: /data/pv-0001
