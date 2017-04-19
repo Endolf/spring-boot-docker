@@ -8,7 +8,7 @@ Based on a number of resources including
 #### Setup
 * To start a local Kubernetes cluster ```minikube start```.
 * Enable heapster for CPU monitoring for autoscaling ```minikube addons enable heapster```
-* You can confirm it's running with ```kubectl cluster-info```.
+* You can confirm it's running with ```kubectl cluster-info``` and ```minikube service --namespace=kube-system monitoring-grafana --url``` to see the monitoring dashboard.
 * To setup ```kubectl``` to use the right cluster run ```kubectl config use-context minikube```
 * To setup docker to use the docker containers in the cluster use ```eval $(minikube docker-env)``` 
 * To build the application and the docker image ```mvn clean package```
@@ -23,7 +23,7 @@ After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` 
 
 To access the app visit the url specified by ```minikube service gs-spring-boot-docker --url```, add ```/messages``` to the end to see the messages.
 
-### Redeploy
+#### Redeploy
 * Build the new version ```mvn clean package```
 * Delete the old app ```kubectl delete -f target/kubernetes/app.yaml```
 * Deploy the new version ```kubectl create -f target/kubernetes/app.yaml```
