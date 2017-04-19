@@ -6,8 +6,9 @@ Based on a number of resources including
 
 ### Run
 #### Setup
-* To start a local Kubernetes cluster
-```minikube start```. You can confirm it's running with ```kubectl cluster-info```.
+* To start a local Kubernetes cluster ```minikube start```.
+* Enable heapster for CPU monitoring for autoscaling ```minikube addons enable heapster```
+* You can confirm it's running with ```kubectl cluster-info```.
 * To setup ```kubectl``` to use the right cluster run ```kubectl config use-context minikube```
 * To setup docker to use the docker containers in the cluster use ```eval $(minikube docker-env)``` 
 * To build the application and the docker image ```mvn clean package```
