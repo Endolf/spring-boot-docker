@@ -18,7 +18,7 @@ kind: StatefulSet
 metadata:
   name: mariadb
 spec:
-  serviceName: "mariadb"
+  serviceName: mariadb
   replicas: 1
   template:
     metadata:
@@ -43,13 +43,9 @@ spec:
               value: rootdbsecret
             - name: MYSQL_DATABASE
               value: mydb
-      volumes:
-        - name: db-persistent-storage
-          persistentVolumeClaim:
-            claimName: db-pv-claim
   volumeClaimTemplates:
     - metadata:
-        name: db-pv-claim
+        name: db-persistent-storage
       spec:
         accessModes:
           - ReadWriteOnce
