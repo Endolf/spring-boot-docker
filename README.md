@@ -3,6 +3,7 @@ Based on a number of resources including
 * [SpringIO Spring Boot with Docker](https://spring.io/guides/gs/spring-boot-docker/)
 * [Compose and Wordpress example](https://docs.docker.com/compose/wordpress/)
 * [Kubernetes Wordpress example](https://github.com/kubernetes/kubernetes/tree/master/examples/mysql-wordpress-pd)
+* [OpenShift Images for a Mariadb+Galera Cluster](https://github.com/adfinis-sygroup/openshift-mariadb-galera)
 
 ### Run
 #### Setup
