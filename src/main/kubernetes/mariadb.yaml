@@ -43,6 +43,14 @@ spec:
               value: rootdbsecret
             - name: MYSQL_DATABASE
               value: mydb
+          readinessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - "mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 'show databases;'"
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
   volumeClaimTemplates:
     - metadata:
         name: db-persistent-storage
