@@ -34,6 +34,8 @@ spec:
           volumeMounts:
             - name: db-persistent-storage
               mountPath: /var/lib/mysql
+            - name: db-config-storage
+              mountPath: /conf/mysql
           env:
             - name: MYSQL_USER
               value: dbuser
@@ -60,3 +62,11 @@ spec:
         resources:
           requests:
             storage: 1Gi
+    - metadata:
+        name: db-persistent-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Mi
