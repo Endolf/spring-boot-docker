@@ -13,6 +13,15 @@ spec:
     app: mariadb
   clusterIP: None
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mariadb-secrets
+type: Opaque
+data:
+  MYSQL_PASSWORD: c2VjcmV0
+  MYSQL_ROOT_PASSWORD: cm9vdGRic2VjcmV0
+---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
@@ -40,9 +49,15 @@ spec:
             - name: MYSQL_USER
               value: dbuser
             - name: MYSQL_PASSWORD
-              value: secret
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secrets
+                  key: MYSQL_PASSWORD
             - name: MYSQL_ROOT_PASSWORD
-              value: rootdbsecret
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secrets
+                  key: MYSQL_ROOT_PASSWORD
             - name: MYSQL_DATABASE
               value: mydb
           readinessProbe:
@@ -63,7 +78,7 @@ spec:
           requests:
             storage: 1Gi
     - metadata:
-        name: db-persistent-storage
+        name: db-config-storage
       spec:
         accessModes:
           - ReadWriteOnce
