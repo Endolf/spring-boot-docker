@@ -26,10 +26,45 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mariadb-config
-  namespace: default
 data:
   MYSQL_USER: dbuser
   MYSQL_DATABASE: mydb
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-conf-d
+data:
+  charset.cnf: |
+    [client]
+    default-character-set = utf8
+
+    [mysqld]
+    character-set-server  = utf8
+    collation-server      = utf8_unicode_ci
+    character_set_server  = utf8
+    collation_server      = utf8_general_ci
+  mysqld_safe_syslog.cnf: |
+    [mysqld_safe]
+    skip_log_error
+    syslog
+  galera.cnf: |
+    [galera]
+    wsrep_sst_method = xtrabackup-v2
+    # This can be insecure, because the user is only available via localhost
+    # We should still try to integrate it with Kubernetes secrets
+    wsrep_sst_auth=xtrabackup_sst:xtrabackup_sst
+    default_storage_engine = innodb
+    binlog_format = row
+    innodb_autoinc_lock_mode = 2
+    innodb_flush_log_at_trx_commit = 0
+    query_cache_size = 0
+    query_cache_type = 0
+
+    # By default every node is standalone
+    wsrep_cluster_address=gcomm://
+    wsrep_cluster_name=galera
+    wsrep_node_address=127.0.0.1
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
@@ -44,6 +79,27 @@ spec:
         app: mariadb
         tier: sql
     spec:
+      initContainers:
+        - name: setup-config
+          image: alpine
+          command: ["/bin/sh", "-c", "
+            set -ex\n
+            rm -Rf /conf/mariadb/*\n
+            cp -aL /conf/mariadb-template/*.cnf /conf/mariadb/\n
+            export MY_NAME=`hostname`\n
+            sed -i -e \"s|^wsrep_node_address=.*$|wsrep_node_address=${MY_NAME}|\" /conf/mariadb/galera.cnf\n
+            export CLUSTER_NAME=`hostname -d | tr '.' '\n' | head -1`\n
+            sed -i -e \"s|^wsrep_cluster_name=.*$|wsrep_cluster_name=${CLUSTER_NAME}|\" /conf/mariadb/galera.cnf\n
+            export NODE_BASE_NAME=`hostname | tr '-' '\n' | head -1`\n
+            export NODE_ID=`hostname | tr '-' '\n' | tail -1`\n
+            export NODES=`for i in \\`seq $NODE_ID\\`; do echo -n \",$NODE_BASE_NAME-$i\"; done | cut -c2-`\n
+            sed -i -e \"s|^wsrep_cluster_address=.*$|wsrep_cluster_address=gcomm://${NODES}|\" /conf/mariadb/galera.cnf\n
+          "]
+          volumeMounts:
+            - name: db-config-storage
+              mountPath: /conf/mariadb
+            - name: mariadb-conf-d
+              mountPath: /conf/mariadb-template
       containers:
         - image: mariadb:10.1
           name: mariadb
@@ -53,7 +109,9 @@ spec:
             - name: db-persistent-storage
               mountPath: /var/lib/mysql
             - name: db-config-storage
-              mountPath: /conf/mysql
+              mountPath: /etc/mysql/conf.d
+            - name: mariadb-conf-d
+              mountPath: /conf/mariadb-template
           env:
             - name: MYSQL_PASSWORD
               valueFrom:
@@ -70,12 +128,13 @@ spec:
                 name: mariadb-config
           readinessProbe:
             exec:
-              command:
-              - sh
-              - -c
-              - "mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'show databases;'"
+              command: ["/bin/sh", "-c", "mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'show databases;'"]
             initialDelaySeconds: 15
             timeoutSeconds: 5
+      volumes:
+        - name: mariadb-conf-d
+          configMap:
+            name: mariadb-conf-d
   volumeClaimTemplates:
     - metadata:
         name: db-persistent-storage
