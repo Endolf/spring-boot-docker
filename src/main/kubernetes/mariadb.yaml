@@ -22,6 +22,15 @@ data:
   MYSQL_PASSWORD: c2VjcmV0
   MYSQL_ROOT_PASSWORD: cm9vdGRic2VjcmV0
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-config
+  namespace: default
+data:
+  MYSQL_USER: dbuser
+  MYSQL_DATABASE: mydb
+---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
@@ -46,8 +55,6 @@ spec:
             - name: db-config-storage
               mountPath: /conf/mysql
           env:
-            - name: MYSQL_USER
-              value: dbuser
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -58,14 +65,15 @@ spec:
                 secretKeyRef:
                   name: mariadb-secrets
                   key: MYSQL_ROOT_PASSWORD
-            - name: MYSQL_DATABASE
-              value: mydb
+          envFrom:
+            - configMapRef:
+                name: mariadb-config
           readinessProbe:
             exec:
               command:
               - sh
               - -c
-              - "mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 'show databases;'"
+              - "mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'show databases;'"
             initialDelaySeconds: 15
             timeoutSeconds: 5
   volumeClaimTemplates:

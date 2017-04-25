@@ -1,3 +1,20 @@
+apiVersion: autoscaling/v2alpha1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: @project.artifactId@
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1beta1
+    kind: Deployment
+    name: @project.artifactId@
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 75
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -29,15 +46,21 @@ spec:
               cpu: 1
             requests:
               cpu: 200m
+          envFrom:
+            - configMapRef:
+                name: mariadb-config
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: production
             - name: DB_URI
-              value: jdbc:mariadb://mariadb:3306/mydb
+              value: jdbc:mariadb://mariadb:3306/${MYSQL_DATABASE}
             - name: DB_USER
-              value: dbuser
+              value: ${MYSQL_USER}
             - name: DB_PASSWORD
-              value: secret
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secrets
+                  key: MYSQL_PASSWORD
             - name: DB_DRIVER
               value: org.mariadb.jdbc.Driver
             - name: DB_DIALECT
