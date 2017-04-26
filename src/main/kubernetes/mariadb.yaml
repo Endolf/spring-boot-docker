@@ -61,6 +61,7 @@ data:
     query_cache_size = 0
     query_cache_type = 0
     wsrep_on=ON
+    wsrep_provider=/usr/lib/galera/libgalera_smm.so
 
     # By default every node is standalone
     wsrep_cluster_address=gcomm://
@@ -73,7 +74,7 @@ metadata:
   name: mariadb
 spec:
   serviceName: mariadb
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -107,6 +108,13 @@ spec:
           name: mariadb
           ports:
             - containerPort: 3306
+              name: mysql
+            - containerPort: 4444
+              name: sst
+            - containerPort: 4567
+              name: replication
+            - containerPort: 4568
+              name: ist
           volumeMounts:
             - name: db-persistent-storage
               mountPath: /var/lib/mysql
