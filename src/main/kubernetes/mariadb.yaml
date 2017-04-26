@@ -60,6 +60,7 @@ data:
     innodb_flush_log_at_trx_commit = 0
     query_cache_size = 0
     query_cache_type = 0
+    wsrep_on=ON
 
     # By default every node is standalone
     wsrep_cluster_address=gcomm://
@@ -72,7 +73,7 @@ metadata:
   name: mariadb
 spec:
   serviceName: mariadb
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -86,13 +87,14 @@ spec:
             set -ex\n
             rm -Rf /conf/mariadb/*\n
             cp -aL /conf/mariadb-template/*.cnf /conf/mariadb/\n
-            export MY_NAME=`hostname`\n
+            export MY_NAME=`hostname -f`\n
             sed -i -e \"s|^wsrep_node_address=.*$|wsrep_node_address=${MY_NAME}|\" /conf/mariadb/galera.cnf\n
             export CLUSTER_NAME=`hostname -d | tr '.' '\n' | head -1`\n
             sed -i -e \"s|^wsrep_cluster_name=.*$|wsrep_cluster_name=${CLUSTER_NAME}|\" /conf/mariadb/galera.cnf\n
             export NODE_BASE_NAME=`hostname | tr '-' '\n' | head -1`\n
             export NODE_ID=`hostname | tr '-' '\n' | tail -1`\n
-            export NODES=`for i in \\`seq $NODE_ID\\`; do echo -n \",$NODE_BASE_NAME-$i\"; done | cut -c2-`\n
+            export DOMAIN=`hostname -d`\n
+            export NODES=`for i in \\`seq 0 ${NODE_ID}\\`; do echo $NODE_BASE_NAME-$i.$DOMAIN; done | head -n -1 | tr '\n' ',' | cut -c1- | rev | cut -c2- | rev`\n
             sed -i -e \"s|^wsrep_cluster_address=.*$|wsrep_cluster_address=gcomm://${NODES}|\" /conf/mariadb/galera.cnf\n
           "]
           volumeMounts:
