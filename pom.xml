@@ -22,6 +22,18 @@
 
     <modules>
         <module>spring-boot-app</module>
+        <module>mariadb</module>
         <module>kubernetes</module>
     </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
