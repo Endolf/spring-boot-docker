@@ -1,4 +1,5 @@
 [galera]
+#wsrep_sst_method = mysqldump
 wsrep_sst_method = xtrabackup-v2
 # This can be insecure, because the user is only available via localhost
 # We should still try to integrate it with Kubernetes secrets
