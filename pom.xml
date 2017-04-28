@@ -35,14 +35,10 @@
                     <version>0.4.11</version>
                     <configuration>
                         <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                        <imageTags>
+                            <imageTag>${project.version}</imageTag>
+                        </imageTags>
                         <dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
-                        <resources>
-                            <resource>
-                                <targetPath>/${project.artifactId}</targetPath>
-                                <directory>${project.build.directory}</directory>
-                                <include>${project.build.finalName}.${project.packaging}</include>
-                            </resource>
-                        </resources>
                     </configuration>
                     <executions>
                         <execution>
@@ -51,17 +47,6 @@
                             <goals>
                                 <goal>build</goal>
                             </goals>
-                        </execution>
-                        <execution>
-                            <id>tag-image</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>tag</goal>
-                            </goals>
-                            <configuration>
-                                <image>${docker.image.prefix}/${project.artifactId}:latest</image>
-                                <newName>${docker.image.prefix}/${project.artifactId}:${project.version}</newName>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
