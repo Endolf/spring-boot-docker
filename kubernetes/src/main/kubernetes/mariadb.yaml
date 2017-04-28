@@ -103,7 +103,7 @@ spec:
             - name: mariadb-conf-d
               mountPath: /conf/mariadb-template
       containers:
-        - image: mariadb:10.1
+        - image: @docker.image.prefix@/mariadb:@project.version@
           name: mariadb
           ports:
             - containerPort: 3306
