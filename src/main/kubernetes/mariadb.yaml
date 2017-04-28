@@ -60,7 +60,6 @@ data:
     innodb_flush_log_at_trx_commit = 0
     query_cache_size = 0
     query_cache_type = 0
-    wsrep_on=ON
     wsrep_provider=/usr/lib/galera/libgalera_smm.so
 
     # By default every node is standalone
@@ -74,7 +73,7 @@ metadata:
   name: mariadb
 spec:
   serviceName: mariadb
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -82,7 +81,7 @@ spec:
         tier: sql
     spec:
       initContainers:
-        - name: setup-config
+        - name: setup-mysql-config
           image: alpine
           command: ["/bin/sh", "-c", "
             set -ex\n
@@ -120,8 +119,6 @@ spec:
               mountPath: /var/lib/mysql
             - name: db-config-storage
               mountPath: /etc/mysql/conf.d
-            - name: mariadb-conf-d
-              mountPath: /conf/mariadb-template
           env:
             - name: MYSQL_PASSWORD
               valueFrom:
@@ -138,9 +135,10 @@ spec:
                 name: mariadb-config
           readinessProbe:
             exec:
-              command: ["/bin/sh", "-c", "mysql -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'show databases;'"]
+              command: ["/bin/sh", "-c", "mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 'show databases;'"]
             initialDelaySeconds: 15
-            timeoutSeconds: 5
+            timeoutSeconds: 45
+          args: ["mysqld", "--wsrep-on"]
       volumes:
         - name: mariadb-conf-d
           configMap:
