@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -exo pipefail
+
 if [ "${1:0:1}" = '-' ]; then
   set -- mysqld "$@"
 fi
@@ -61,6 +63,11 @@ EOSQL
 
     echo 'FLUSH PRIVILEGES ;' >> "$tempSqlFile"
 
+    if [ -z "$MYSQL_INITDB_SKIP_TZINFO" ]; then
+      # sed is for https://bugs.mysql.com/bug.php?id=20545
+      mysql_tzinfo_to_sql /usr/share/zoneinfo | sed 's/Local time zone must be set--see zic manual page/FCTY/' >> "$tempSqlFile"
+    fi
+
     cat $tempSqlFile
 
     # Add the SQL file to mysqld's command line args
@@ -69,10 +76,6 @@ EOSQL
 
   chown -R mysql:mysql "$DATADIR"
 
-  if [ -z "$MYSQL_INITDB_SKIP_TZINFO" ]; then
-    # sed is for https://bugs.mysql.com/bug.php?id=20545
-	mysql_tzinfo_to_sql /usr/share/zoneinfo | sed 's/Local time zone must be set--see zic manual page/FCTY/' | "${mysql[@]}" mysql
-  fi
 fi
 
 if [ -n "$GALERA_CLUSTER" ]; then

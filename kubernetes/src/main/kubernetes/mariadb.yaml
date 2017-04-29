@@ -32,7 +32,7 @@ data:
   MYSQL_DATABASE: mydb
   WSREP_SST_USER: sst
   GALERA_CLUSTER: galera
-  MYSQL_INITDB_SKIP_TZINFO: yes
+  MYSQL_INITDB_SKIP_TZINFO: "yes"
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
@@ -87,6 +87,7 @@ spec:
               command: ["/bin/bash", "-c", "echo test"]
             initialDelaySeconds: 15
             timeoutSeconds: 5
+          #command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
   volumeClaimTemplates:
     - metadata:
         name: db-persistent-storage
