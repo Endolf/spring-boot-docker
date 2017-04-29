@@ -56,7 +56,11 @@ spec:
             - containerPort: 4444
               name: sst
             - containerPort: 4567
-              name: replication
+              protocol: TCP
+              name: replication-tcp
+            - containerPort: 4567
+              protocol: UDP
+              name: replication-udp
             - containerPort: 4568
               name: ist
           volumeMounts:
@@ -87,7 +91,7 @@ spec:
               command: ["/bin/bash", "-c", "echo test"]
             initialDelaySeconds: 15
             timeoutSeconds: 5
-          #command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
+          command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
   volumeClaimTemplates:
     - metadata:
         name: db-persistent-storage
