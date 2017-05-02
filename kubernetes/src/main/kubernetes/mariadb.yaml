@@ -86,12 +86,10 @@ spec:
             - configMapRef:
                 name: mariadb-config
           readinessProbe:
-            exec:
-              #command: ["/bin/sh", "-c", "mysql -u root -p${MYSQL_ROOT_PASSWORD} -e 'show databases;'"]
-              command: ["/bin/bash", "-c", "echo test"]
-            initialDelaySeconds: 15
+            tcpSocket:
+              port: mysql
+            initialDelaySeconds: 30
             timeoutSeconds: 5
-          #command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
           command: ["/bin/bash", "-c", "docker-entrypoint.sh mysqld"]
   volumeClaimTemplates:
     - metadata:
