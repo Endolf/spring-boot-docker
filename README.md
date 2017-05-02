@@ -39,9 +39,4 @@ then ```kubectl get all,endpoints,pvc,pv``` to confirm.
 
 Use the Kubernetes dashboard to delete the persistent volumes.
 
-### Known issues
-This is a proof of concept, so there are known issues with running this in a production environment.
-* The database instances have a long pause on startup, this is to work around an issue where the first node was hanging (socat 100% cpu) during initial replication to the secondary.
-This may have involved some DNS resolution issues but is not fully clear what caused this.
-* The node status check for the database is done of a simple bash command, when running a mysql client to check for the status issues around socat hitting 100% were also discovered.
-* The database can't currently recover from a node failing, this is due to the nodes trying to join the cluster based on their ID. A DNS query of the service to build the ```wsrep_cluster_address``` variable ought to solve this.
+This is a proof of concept, use it as a starting point and at your own risk.
