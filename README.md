@@ -19,25 +19,29 @@ Based on a number of resources including
 #### Deployment
 After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` to confirm the step.
 
-* To create the persistent storage ```kubectl create -f target/kubernetes/local-storage.yaml```
-* To deploy the database ```kubectl create -f target/kubernetes/mariadb.yaml```
-* To deploy the application ```kubectl create -f target/kubernetes/app.yaml```
-* To deploy the auto scaler ```kubectl create -f target/kubernetes/app-autoscaler.yaml```
-* To deploy the application service ```kubectl create -f target/kubernetes/app-service.yaml```
+* To deploy the database ```kubectl create -f kubernetes/target/kubernetes/mariadb.yaml```
+* To deploy the application ```kubectl create -f kubernetes/target/kubernetes/app.yaml```
+* To deploy the application service ```kubectl create -f kubernetes/target/kubernetes/app-service.yaml```
 
-To access the app visit the url specified by ```minikube service gs-spring-boot-docker --url```, add ```/messages``` to the end to see the messages.
+To access the app visit the url specified by ```minikube service spring-boot-app --url```, add ```/messages``` to the end to see the messages.
 
 #### Redeploy
 * Build the new version ```mvn clean package```
-* Delete the old app ```kubectl delete -f target/kubernetes/app.yaml```
-* Deploy the new version ```kubectl create -f target/kubernetes/app.yaml```
+* Delete the old app ```kubectl delete -f kubernetes/target/kubernetes/app.yaml```
+* Deploy the new version ```kubectl create -f kubernetes/target/kubernetes/app.yaml```
 
 ### Cleanup
-* Delete the app service ```kubectl delete -f target/kubernetes/app-service.yaml```
-* Delete the auto scaler ```kubectl delete -f target/kubernetes/app-autoscaler.yaml```
-* Delete the app ```kubectl delete -f target/kubernetes/app.yaml```
-* Delete the database nodes ```kubectl delete -f target/kubernetes/mariadb.yaml```
+* Delete the app service ```kubectl delete -f kubernetes/target/kubernetes/app-service.yaml```
+* Delete the app ```kubectl delete -f kubernetes/target/kubernetes/app.yaml```
+* Delete the database nodes ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
 
 then ```kubectl get all,endpoints,pvc,pv``` to confirm.
 
-To delete the persistent storage ```kubectl delete -f target/kubernetes/local-storage.yaml``` 
+Use the Kubernetes dashboard to delete the persistent volumes.
+
+### Known issues
+This is a proof of concept, so there are known issues with running this in a production environment.
+* The database instances have a long pause on startup, this is to work around an issue where the first node was hanging (socat 100% cpu) during initial replication to the secondary.
+This may have involved some DNS resolution issues but is not fully clear what caused this.
+* The node status check for the database is done of a simple bash command, when running a mysql client to check for the status issues around socat hitting 100% were also discovered.
+* The database can't currently recover from a node failing, this is due to the nodes trying to join the cluster based on their ID. A DNS query of the service to build the ```wsrep_cluster_address``` variable ought to solve this.
