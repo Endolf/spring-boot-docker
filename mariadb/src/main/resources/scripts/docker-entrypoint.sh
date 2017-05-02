@@ -13,8 +13,10 @@ if [ "$1" = 'mysqld' ]; then
 
   # only check if system tables not created from mysql_install_db and permissions
   # set with initial SQL script before proceeding to build SQL script
-  if [ ! -d "$DATADIR/mysql" ]; then
-  # fail if user didn't supply a root password
+  if [ ! -d "${DATADIR}mysql" ]; then
+    ls -la $DATADIR
+
+    # fail if user didn't supply a root password
     if [ -z "$MYSQL_ROOT_PASSWORD" -a -z "$MYSQL_ALLOW_EMPTY_PASSWORD" ]; then
       echo >&2 'error: database is uninitialized and MYSQL_ROOT_PASSWORD not set'
       echo >&2 '  Did you forget to add -e MYSQL_ROOT_PASSWORD=... ?'
@@ -79,14 +81,11 @@ EOSQL
 fi
 
 if [ -n "$GALERA_CLUSTER" ]; then
-  MY_NAME=`hostname -f`
-  sed -i -e "s|^wsrep_node_address=.*$|wsrep_node_address=${MY_NAME}|" /etc/mysql/conf.d/galera.cnf
+  MY_IP=`getent hosts \`hostname -s\` | tr " " "\n" | head -1`
+  sed -i -e "s|^wsrep_node_address=.*$|wsrep_node_address=${MY_IP}|" /etc/mysql/conf.d/galera.cnf
   CLUSTER_NAME=`hostname -d | tr '.' '\n' | head -1`
   sed -i -e "s|^wsrep_cluster_name=.*$|wsrep_cluster_name=${CLUSTER_NAME}|" /etc/mysql/conf.d/galera.cnf
-  NODE_BASE_NAME=`hostname | tr '-' '\n' | head -1`
-  NODE_ID=`hostname | tr '-' '\n' | tail -1`
-  DOMAIN=`hostname -d`
-  NODES=`for i in \`seq 0 ${NODE_ID}\`; do echo $NODE_BASE_NAME-$i.$DOMAIN; done | head -n -1 | tr '\n' ',' | cut -c1- | rev | cut -c2- | rev`
+  NODES=`getent hosts \`hostname -d\` | tr " " "\n" | grep -P "\d+\.\d+\.\d+\.\d+" | paste -sd "," - || echo ""`
   sed -i -e "s|^wsrep_cluster_address=.*$|wsrep_cluster_address=gcomm://${NODES}|" /etc/mysql/conf.d/galera.cnf
   sed -i -e "s|^wsrep_cluster_name=.*$|wsrep_cluster_name=${GALERA_CLUSTER}|" /etc/mysql/conf.d/galera.cnf
   sed -i -e "s|^wsrep_on=.*$|wsrep_on=ON|" /etc/mysql/conf.d/galera.cnf
@@ -97,7 +96,5 @@ fi
 
 sed -i -e "s|^server\-id=.*$|server-id=${RANDOM}|" /etc/mysql/my.cnf
 sed -i -e "s|^#log_bin[= \t].*$|log_bin=${DATADIR}mariadb-bin|" /etc/mysql/my.cnf
-
-sleep 60s
 
 exec gosu mysql "$@" 2>&1 > /var/lib/mysql/run.log
