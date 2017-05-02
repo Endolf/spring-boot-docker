@@ -98,4 +98,6 @@ fi
 sed -i -e "s|^server\-id=.*$|server-id=${RANDOM}|" /etc/mysql/my.cnf
 sed -i -e "s|^#log_bin[= \t].*$|log_bin=${DATADIR}mariadb-bin|" /etc/mysql/my.cnf
 
-exec gosu mysql "$@"
+sleep 60s
+
+exec gosu mysql "$@" 2>&1 > /var/lib/mysql/run.log

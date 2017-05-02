@@ -40,7 +40,7 @@ metadata:
   name: mariadb
 spec:
   serviceName: mariadb
-  replicas: 2
+  replicas: 3
   template:
     metadata:
       labels:
@@ -91,7 +91,8 @@ spec:
               command: ["/bin/bash", "-c", "echo test"]
             initialDelaySeconds: 15
             timeoutSeconds: 5
-          command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
+          #command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
+          command: ["/bin/bash", "-c", "docker-entrypoint.sh mysqld"]
   volumeClaimTemplates:
     - metadata:
         name: db-persistent-storage
