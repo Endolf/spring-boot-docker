@@ -4,7 +4,7 @@ metadata:
   name: mariadb
   labels:
     app: mariadb
-    tier: sql
+    tier: database
 spec:
   ports:
     - port: 3306
@@ -45,7 +45,7 @@ spec:
     metadata:
       labels:
         app: mariadb
-        tier: sql
+        tier: database
     spec:
       containers:
         - image: @docker.image.prefix@/mariadb:@project.version@
@@ -64,7 +64,7 @@ spec:
             - containerPort: 4568
               name: ist
           volumeMounts:
-            - name: db-persistent-storage
+            - name: mariadb-persistent-storage
               mountPath: /var/lib/mysql
           env:
             - name: MYSQL_PASSWORD
@@ -93,7 +93,7 @@ spec:
           command: ["/bin/bash", "-c", "docker-entrypoint.sh mysqld"]
   volumeClaimTemplates:
     - metadata:
-        name: db-persistent-storage
+        name: mariadb-persistent-storage
       spec:
         accessModes:
           - ReadWriteOnce
