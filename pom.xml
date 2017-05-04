@@ -23,6 +23,8 @@
     <modules>
         <module>spring-boot-app</module>
         <module>mariadb</module>
+        <module>mongodb</module>
+        <module>mongo-sidekick</module>
         <module>kubernetes</module>
     </modules>
 
