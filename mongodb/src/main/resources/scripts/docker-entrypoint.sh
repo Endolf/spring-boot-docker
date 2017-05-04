@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 if [ "${1:0:1}" = '-' ]; then
 	set -- mongod "$@"
@@ -182,7 +182,8 @@ if [ "$originalArgOne" = 'mongod' ]; then
 		done
 
     	if [ ! -z "$MONGO_RS" ]; then
-            OTHER_HOSTS=`getent hosts \`hostname -d\` | cut -d " " -f1 | ( grep -v \`hostname -i\` | true )`
+            ALL_HOSTS=`getent hosts \`hostname -d\` | cut -d " " -f1`
+            OTHER_HOSTS=${ALL_HOSTS[@]/`hostname -i`}
             if [ -z "$OTHER_HOSTS" ]; then
                 "${mongo[@]}" admin <<-EOJS
                     rsStatus = db.runCommand( { replSetGetStatus : 1 } ).ok
