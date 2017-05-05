@@ -1,11 +1,25 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -exo pipefail
+set -x
 
-trap : TERM INT
-
-while true
+while true;
 do
-  sleep 10s
-  HOSTS=`dig +noall +answer SRV \`hostname -d\` | cut -d " " -f7 | rev | cut -c2- | rev | grep -v \`hostname -f\``
+    timeout 1 bash -c 'cat < /dev/null > /dev/tcp/localhost/27017'
+    exitCode=$?
+
+    if [ $exitCode = 0 ]; then
+        otherNodeCount=`getent hosts \`hostname -d\` | wc -l`
+        myip=`hostname -i`
+
+        if [ $otherNodeCount = 0 ]; then
+            mongo localhost --eval "var myip=\"${myip}\", myrs=\"${MONGO_RS}\", adminDatabase=\"${MONGO_ADMIN_DATABASE}\", adminUser=\"${MONGO_ADMIN_USERNAME}\", adminPassword=\"${MONGO_ADMIN_PASSWORD}\"" /data/create-rs.js
+        else
+            mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval "rs.add(\"`hostname -i`\")"
+        fi
+        break
+    fi
+    sleep 1s
 done
+
+trap : TERM INT;
+sleep infinity & wait

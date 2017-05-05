@@ -9,4 +9,7 @@ RUN \
     rm -rf /var/lib/apt/lists/*
 
 ADD classes/scripts/docker-entrypoint.sh /usr/local/bin/
+ADD classes/scripts/create-rs.js /data/
+RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
+
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
