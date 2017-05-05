@@ -66,6 +66,7 @@ spec:
         - name: mkdirs
           image: alpine:3.5
           command: ["/bin/sh", "-c", "
+            set -x\n
             if [ ! -d \"/data/db\" ]; then\n
               mkdir /data/db\n
             fi\n
