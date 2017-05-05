@@ -8,6 +8,7 @@ Based on a number of resources including
 * [Galera Cluster Status Monitoring](http://galeracluster.com/documentation-webpages/monitoringthecluster.html)
 * [Running MongoDB as a Microservice with Docker and Kubernetes](https://www.mongodb.com/blog/post/running-mongodb-as-a-microservice-with-docker-and-kubernetes)
 * [Enabling Microservices: Containers & Orchestration Explained](https://www.mongodb.com/collateral/microservices-containers-and-orchestration-explained)
+* [Mongo internal authentication](https://docs.mongodb.com/v3.0/tutorial/enable-internal-authentication/)
 
 ### Run
 #### Setup
