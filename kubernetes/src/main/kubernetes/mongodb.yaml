@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+    tier: database
+spec:
+  ports:
+    - port: 27017
+      name: mongodb
+  selector:
+    app: mongodb
+  clusterIP: None
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secrets
+type: Opaque
+data:
+  MONGO_ADMIN_PASSWORD: c2VjcmV0
+  mongodb-key: |
+    aGNMVjY2by9iR1JQbnc2M3laZXYveURqalRsanBHK2Fkem5HZXEwOXllY0V4YnY4bG1PUHo5MmR0
+    ZWtUYmc4KwpocG0wSExUclVTZGFxd21SdzBVUnZqZW1CbmY5cWdDZjN3ZDNoMHJvRVVpWDVPb2J2
+    U3IzNGNVL2RROVZtck56CmluSGE2clZwSFJHRzUvVHRvVitKQ29Dd3cvc3lyMmErcjdzc2Fwb3pw
+    dzV0NU1jTk1CbEtDL0NjdjJVc0RhOVEKU0szd0lINmpoN1lycFZVNTJ3SmpEVDNQTU14bHJqc0lJ
+    Ty9US0xSdXA2NDdZVVgvVFdTRHhlVTcyckUvSG9qUwpMK1VBTHBiazFTZlpxYTk2clpWaDkvMjN5
+    czlYbFhjK0RDQWhuMlBjUDh3ZVR2LzY0c1A0S2FESlpORUtBSW9HCnBnQWFBZlRTNXNHaExLMjl1
+    dzZIaWdnbk84S2VJckRDL1VCd0pvck1hK2NESTd3Ymo1dTFsTElxM1kyUU9qekUKSVdud3NsbmJ2
+    anMrOWtsVlFaVzJNNDYxTVFSRXI4N2lKMkpWUFFEYTdmWWdIb2RLODlPM1A5Y2tNcU55UkhnbApZ
+    K2FXaVBDZ3pzb3pDYkcySXU3TjNVSSsyZENnRVdpbjZXL3dtbGFiVlBuLzUwZVJpSXphYnpMRnlT
+    REQ2aFRZCmFOZ2R0RUtIZmpRVHFDR3FGSUx3TGUwdklIL0NSdmErcGhsMGJQdUhYTGZOak9VYkQ4
+    SGNDajVVemFiUEYyR3YKN2J5M1NiK3ZnYmFDK1VaTEhvd09PSWhma2FqQzBLenpTVmxLbkRaVjRl
+    clNSYmx5SkFoQ0RJelNCN1dmdHhTVwp5cHMxQzhRaXc1NHlGY21WZjZLc0llblZUZGMxY0I2WEwy
+    TndFcTgvQkFWL0xTNkZKQi9sZU5xUytuZ0ozUitZCnYxV2VkZDdlTFRMT3FTbmtvalhsRHVWU2kr
+    SkhuQXUzOFVhSzZJbGVoYTVwbkd5NVpkSWIrZzFSTkdXZFJuVGQKMXNpZDJzalRBZVdwYjhSMWFR
+    RHNKd1JNR1FzTDk5Q3UwVGV4ZFBVeWxCZ0tVc20xT3p1ME1NQ0k2dndHWkQ1KwpCWWM0QTRJcS9n
+    UWdPc3dVTUtxbEd5eGh6OFY0UFZmSExOS2NjTjVsYnNaUTB3dFhKVGNVSVNyVXFHNkZkeVp0CkhH
+    TlJ4TVpVOXZjN3FPUGJwbmZoOHlHZlp1VGxCRHVoelRPbndhOWp5aHRQcGxCS2ZoYS9yazB5QWlU
+    K0xmRkkKWWJ1Rk9pVFA0bDVCM2NiUFZpTEVKcENPQTRRQgo=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-env
+data:
+  MONGO_ADMIN_USERNAME: dbuser
+  MONGO_ADMIN_DATABASE: admin
+  MONGO_RS: rs0
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        tier: database
+    spec:
+      initContainers:
+        - name: mkdirs
+          image: alpine:3.5
+          command: ["/bin/sh", "-c", "
+            if [ ! -d \"/data/db\" ]; then\n
+              mkdir /data/db\n
+            fi\n
+            if [ ! -d \"/data/configdb\" ]; then\n
+              mkdir /data/configdb\n
+            fi\n
+            cp /key/key /data/mongo-key\n
+            chown 999:999 /data/mongo-key\n
+          "]
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data
+            - name: mongodb-key
+              mountPath: /key
+      containers:
+        - image: mongo:3.4
+          name: mongodb
+          ports:
+            - containerPort: 27017
+              name: mongo
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data
+          env:
+            - name: MONGO_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: MONGO_ADMIN_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: mongodb-env
+          readinessProbe:
+            exec:
+              command: ["/bin/bash", "-c", "
+                mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} --quiet localhost/?replicaSet=${MONGO_RS} --eval \"rs.status().ok==1\" | grep -v NETWORK | grep true \n
+              "]
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          args: ["--keyFile", "/data/mongo-key", "--replSet", "$(MONGO_RS)"]
+        - image: @docker.image.prefix@/mongo-sidekick:@project.version@
+          name: mongo-sidekick
+          env:
+            - name: MONGO_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secrets
+                  key: MONGO_ADMIN_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: mongodb-env
+      volumes:
+        - name: mongodb-key
+          secret:
+            secretName: mongodb-secrets
+            items:
+              - key: mongodb-key
+                path: key
+                mode: 0600
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-persistent-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
