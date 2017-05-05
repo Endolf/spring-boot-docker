@@ -6,6 +6,8 @@ Based on a number of resources including
 * [OpenShift Images for a Mariadb+Galera Cluster](https://github.com/adfinis-sygroup/openshift-mariadb-galera)
 * [MariaDB Galera docs](https://mariadb.com/kb/en/mariadb/getting-started-with-mariadb-galera-cluster/)
 * [Galera Cluster Status Monitoring](http://galeracluster.com/documentation-webpages/monitoringthecluster.html)
+* [Running MongoDB as a Microservice with Docker and Kubernetes](https://www.mongodb.com/blog/post/running-mongodb-as-a-microservice-with-docker-and-kubernetes)
+* [Enabling Microservices: Containers & Orchestration Explained](https://www.mongodb.com/collateral/microservices-containers-and-orchestration-explained)
 
 ### Run
 #### Setup
@@ -19,7 +21,8 @@ Based on a number of resources including
 #### Deployment
 After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` to confirm the step.
 
-* To deploy the database ```kubectl create -f kubernetes/target/kubernetes/mariadb.yaml```
+* To deploy the SQL database ```kubectl create -f kubernetes/target/kubernetes/mariadb.yaml```
+* To deploy the NoSQL database ```kubectl create -f kubernetes/target/kubernetes/mongodb.yaml```
 * To deploy the application ```kubectl create -f kubernetes/target/kubernetes/app.yaml```
 * To deploy the application service ```kubectl create -f kubernetes/target/kubernetes/app-service.yaml```
 
@@ -33,7 +36,8 @@ To access the app visit the url specified by ```minikube service spring-boot-app
 ### Cleanup
 * Delete the app service ```kubectl delete -f kubernetes/target/kubernetes/app-service.yaml```
 * Delete the app ```kubectl delete -f kubernetes/target/kubernetes/app.yaml```
-* Delete the database nodes ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
+* Delete the NoSQL database nodes ```kubectl delete -f kubernetes/target/kubernetes/mongodb.yaml```
+* Delete the SQL database nodes ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
 
 then ```kubectl get all,endpoints,pvc,pv``` to confirm.
 
