@@ -1,5 +1,5 @@
-var rsStatus = rs.status().ok;
-if(rsStatus==0) {
+var rsStatus = rs.status();
+if(rsStatus.ok==0) {
     rs.initiate({_id : myrs, members: [{ _id : 0, host : myip}]});
 
     startTime = new ISODate().valueOf();
@@ -13,5 +13,19 @@ if(rsStatus==0) {
         pwd: adminPassword,
         roles: [ { role: 'root', db: adminDatabase } ]
     });
+} else if(rsStatus.ok==1) {
+
+    aliveMembers = rsStatus.members.filter(function(statusMember){
+        return statusMember.state!==6 && statusMember.state!==8 && statusMember.state!==10
+    }).map(function(statusMember) {
+       return statusMember.name;
+    });
+
+    rsconf = rs.conf();
+    rsconf.members = rsconf.members.filter(function(member){
+        return aliveMembers.includes(member.host);
+    });
+
+    rs.reconfig(rsconf, {force: true});
 }
 

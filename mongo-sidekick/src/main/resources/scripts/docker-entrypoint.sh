@@ -12,7 +12,7 @@ do
         myip=`hostname -i`
 
         if [ $otherNodeCount = 0 ]; then
-            mongo localhost --eval "var myip=\"${myip}\", myrs=\"${MONGO_RS}\", adminDatabase=\"${MONGO_ADMIN_DATABASE}\", adminUser=\"${MONGO_ADMIN_USERNAME}\", adminPassword=\"${MONGO_ADMIN_PASSWORD}\"" /data/create-rs.js
+            mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} localhost --eval "var myip=\"${myip}\", myrs=\"${MONGO_RS}\", adminDatabase=\"${MONGO_ADMIN_DATABASE}\", adminUser=\"${MONGO_ADMIN_USERNAME}\", adminPassword=\"${MONGO_ADMIN_PASSWORD}\"" /data/create-rs.js
         else
             mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval "rs.add(\"`hostname -i`\")"
         fi
