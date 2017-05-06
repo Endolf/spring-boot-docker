@@ -67,18 +67,12 @@ spec:
           image: alpine:3.5
           command: ["/bin/sh", "-c", "
             set -x\n
-            if [ ! -d \"/data/db\" ]; then\n
-              mkdir /data/db\n
-            fi\n
-            if [ ! -d \"/data/configdb\" ]; then\n
-              mkdir /data/configdb\n
-            fi\n
-            cp /key/key /data/mongo-key\n
-            chown 999:999 /data/mongo-key\n
+            cp /key/key /data/db/mongo-key\n
+            chown 999:999 /data/db/mongo-key\n
           "]
           volumeMounts:
             - name: mongo-persistent-storage
-              mountPath: /data
+              mountPath: /data/db
             - name: mongodb-key
               mountPath: /key
       containers:
@@ -89,7 +83,7 @@ spec:
               name: mongo
           volumeMounts:
             - name: mongo-persistent-storage
-              mountPath: /data
+              mountPath: /data/db
           env:
             - name: MONGO_ADMIN_PASSWORD
               valueFrom:
@@ -106,7 +100,7 @@ spec:
               "]
             initialDelaySeconds: 60
             timeoutSeconds: 5
-          args: ["--keyFile", "/data/mongo-key", "--replSet", "$(MONGO_RS)"]
+          args: ["--keyFile", "/data/db/mongo-key", "--replSet", "$(MONGO_RS)"]
         - image: @docker.image.prefix@/mongo-sidekick:@project.version@
           name: mongo-sidekick
           env:
