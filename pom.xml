@@ -22,7 +22,6 @@
 
     <modules>
         <module>spring-boot-app</module>
-        <module>mariadb</module>
         <module>kubernetes</module>
     </modules>
 

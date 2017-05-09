@@ -34,6 +34,85 @@ data:
   GALERA_CLUSTER: galera
   MYSQL_INITDB_SKIP_TZINFO: "yes"
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-config-setup
+data:
+  charset-cnf: |
+    [client]
+    default-character-set = utf8
+
+    [mysqld]
+    character-set-server  = utf8
+    collation-server      = utf8_unicode_ci
+    character_set_server  = utf8
+    collation_server      = utf8_general_ci
+  galera-cnf: |
+    [galera]
+    wsrep_sst_method = xtrabackup-v2
+    wsrep_sst_auth=sstuser:changethis
+    default_storage_engine = innodb
+    binlog_format = row
+    innodb_autoinc_lock_mode = 2
+    innodb_flush_log_at_trx_commit = 0
+    query_cache_size = 0
+    query_cache_type = 0
+    wsrep_provider=/usr/lib/galera/libgalera_smm.so
+    wsrep_on=OFF
+
+    # By default every node is standalone
+    wsrep_cluster_address=gcomm://
+    wsrep_cluster_name=galera
+    wsrep_node_address=127.0.0.1
+  setup-sh: |
+    #!/bin/bash
+    set -ex
+
+    date
+
+    if [ "$(grep wsrep_on= /tmp/config/galera.cnf || true)" != "wsrep_on=ON" ]; then
+
+      cp -aL /etc/mysql/conf.d/* /tmp/config
+      cp -aL /tmp/maria-config-templates/*.cnf /tmp/config
+
+      if [ -n "$GALERA_CLUSTER" ]; then
+        sed -i -e "s|^wsrep_on=.*$|wsrep_on=OFF|" /tmp/config/galera.cnf
+        sed -i -e "s|^wsrep_cluster_name=.*$|wsrep_cluster_name=${GALERA_CLUSTER}|" /tmp/config/galera.cnf
+        sed -i -e "s|^wsrep_sst_auth=sstuser:changethis|wsrep_sst_auth=${WSREP_SST_USER}:${WSREP_SST_PASSWORD}|" /tmp/config/galera.cnf
+      fi
+
+
+      chown -R mysql:mysql /tmp/config
+    fi
+
+    if [ -n "$GALERA_CLUSTER" ]; then
+      MY_IP=`getent hosts \`hostname -s\` | tr " " "\n" | head -1`
+      sed -i -e "s|^wsrep_node_address=.*$|wsrep_node_address=${MY_IP}|" /tmp/config/galera.cnf
+      CLUSTER_NAME=`hostname -d | tr '.' '\n' | head -1`
+      sed -i -e "s|^wsrep_cluster_name=.*$|wsrep_cluster_name=${CLUSTER_NAME}|" /tmp/config/galera.cnf
+      NODES=`getent hosts \`hostname -d\` | tr " " "\n" | grep -P "\d+\.\d+\.\d+\.\d+" | paste -sd "," - || echo ""`
+      sed -i -e "s|^wsrep_cluster_address=.*$|wsrep_cluster_address=gcomm://${NODES}|" /tmp/config/galera.cnf
+    fi
+
+    cat /tmp/config/galera.cnf
+  final-setup-sh: |
+    #!/bin/bash
+    set -ex
+
+    date
+
+    if [ -n "$GALERA_CLUSTER" ]; then
+      sed -i -e "s|^wsrep_on=.*$|wsrep_on=ON|" /etc/mysql/conf.d/galera.cnf
+      cat /etc/mysql/conf.d/galera.cnf
+
+      mysql=( mysql --protocol=socket -u root -p"${MYSQL_ROOT_PASSWORD}" )
+
+      echo "CREATE USER '${WSREP_SST_USER}'@'localhost' IDENTIFIED BY '${WSREP_SST_PASSWORD}';" | "${mysql[@]}"
+      echo "GRANT RELOAD, LOCK TABLES, REPLICATION CLIENT ON *.* TO '${WSREP_SST_USER}'@'localhost';" | "${mysql[@]}"
+      echo 'FLUSH PRIVILEGES ;' | "${mysql[@]}"
+    fi
+---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
@@ -47,8 +126,38 @@ spec:
         app: mariadb
         tier: database
     spec:
+      initContainers:
+        - image: mariadb:10.1
+          name: mariadb-config-prep
+          env:
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secrets
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secrets
+                  key: MYSQL_ROOT_PASSWORD
+            - name: WSREP_SST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secrets
+                  key: WSREP_SST_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: mariadb-config
+          volumeMounts:
+            - name: mariadb-config-templates
+              mountPath: /tmp/maria-config-templates
+            - name: mariadb-config-setup
+              mountPath: /tmp/maria-config-setup
+            - name: config-storage
+              mountPath: /tmp/config
+          command: ["/bin/bash", "-c", "/tmp/maria-config-setup/setup.sh"]
       containers:
-        - image: @docker.image.prefix@/mariadb:@project.version@
+        - image: mariadb:10.1
           name: mariadb
           ports:
             - containerPort: 3306
@@ -64,8 +173,12 @@ spec:
             - containerPort: 4568
               name: ist
           volumeMounts:
-            - name: mariadb-persistent-storage
+            - name: data-storage
               mountPath: /var/lib/mysql
+            - name: config-storage
+              mountPath: /etc/mysql/conf.d/
+            - name: mariadb-final-setup
+              mountPath: /docker-entrypoint-initdb.d/
           env:
             - name: MYSQL_PASSWORD
               valueFrom:
@@ -90,13 +203,60 @@ spec:
               port: mysql
             initialDelaySeconds: 30
             timeoutSeconds: 5
-          command: ["/bin/bash", "-c", "docker-entrypoint.sh mysqld"]
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "
+                  set -x\n
+                  NODES=`getent hosts \\`hostname -d\\` | tr \" \" \"\\n\" | grep -P \"\\d+\\.\\d+\\.\\d+\\.\\d+\" | paste -sd \",\" - || echo \"\"`\n
+                  sed -i -e \"s|^wsrep_cluster_address=.*$|wsrep_cluster_address=gcomm://${NODES}|\" /etc/mysql/conf.d/galera.cnf\n
+                "]
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "
+                  set -x\n
+                  NODES=`getent hosts \\`hostname -d\\` | tr \" \" \"\\n\" | grep -P \"\\d+\\.\\d+\\.\\d+\\.\\d+\" | paste -sd \",\" - || echo \"\"`\n
+                  sed -i -e \"s|^wsrep_cluster_address=.*$|wsrep_cluster_address=gcomm://${NODES}|\" /etc/mysql/conf.d/galera.cnf\n
+                "]
+      volumes:
+        - name: mariadb-config-templates
+          configMap:
+            name: mariadb-config-setup
+            items:
+            - key: charset-cnf
+              path: charset.cnf
+              mode: 0400
+            - key: galera-cnf
+              path: galera.cnf
+              mode: 0400
+        - name: mariadb-config-setup
+          configMap:
+            name: mariadb-config-setup
+            items:
+            - key: setup-sh
+              path: setup.sh
+              mode: 0500
+        - name: mariadb-final-setup
+          configMap:
+            name: mariadb-config-setup
+            items:
+            - key: final-setup-sh
+              path: final-setup.sh
+              mode: 0555
   volumeClaimTemplates:
     - metadata:
-        name: mariadb-persistent-storage
+        name: data-storage
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
             storage: 1Gi
+    - metadata:
+        name: config-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Mi
