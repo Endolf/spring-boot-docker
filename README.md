@@ -9,6 +9,7 @@ Based on a number of resources including
 * [Running MongoDB as a Microservice with Docker and Kubernetes](https://www.mongodb.com/blog/post/running-mongodb-as-a-microservice-with-docker-and-kubernetes)
 * [Enabling Microservices: Containers & Orchestration Explained](https://www.mongodb.com/collateral/microservices-containers-and-orchestration-explained)
 * [Mongo internal authentication](https://docs.mongodb.com/v3.0/tutorial/enable-internal-authentication/)
+* [RabbitMQ on Kubernetes](https://wesmorgan.svbtle.com/rabbitmq-cluster-on-kubernetes-with-statefulsets)
 
 ### Run
 #### Setup
@@ -22,8 +23,8 @@ Based on a number of resources including
 #### Deployment
 After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` to confirm the step.
 
-* To deploy the SQL database ```kubectl create -f kubernetes/target/kubernetes/mariadb.yaml```
-* To deploy the NoSQL database ```kubectl create -f kubernetes/target/kubernetes/mongodb.yaml```
+* To deploy the MariaDB database ```kubectl create -f kubernetes/target/kubernetes/mariadb.yaml```
+* To deploy the Mongo database ```kubectl create -f kubernetes/target/kubernetes/mongodb.yaml```
 * To deploy the application ```kubectl create -f kubernetes/target/kubernetes/app.yaml```
 * To deploy the application service ```kubectl create -f kubernetes/target/kubernetes/app-service.yaml```
 
@@ -37,8 +38,8 @@ To access the app visit the url specified by ```minikube service spring-boot-app
 ### Cleanup
 * Delete the app service ```kubectl delete -f kubernetes/target/kubernetes/app-service.yaml```
 * Delete the app ```kubectl delete -f kubernetes/target/kubernetes/app.yaml```
-* Delete the NoSQL database nodes ```kubectl delete -f kubernetes/target/kubernetes/mongodb.yaml```
-* Delete the SQL database nodes ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
+* Delete the Mongo database nodes ```kubectl delete -f kubernetes/target/kubernetes/mongodb.yaml```
+* Delete the MariaDB database nodes ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
 
 then ```kubectl get all,endpoints,pvc,pv``` to confirm.
 
