@@ -141,36 +141,36 @@ spec:
             timeoutSeconds: 5
           args: ["--keyFile", "/data/db/mongo-key", "--replSet", "$(MONGO_RS)"]
           lifecycle:
-                postStart:
-                  exec:
-                    command: ["/bin/sh", "-c", "
-                      set -x\n
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "
+                  set -x\n
 
-                      while true;\n
-                      do\n
-                          timeout 1 bash -c 'cat < /dev/null > /dev/tcp/localhost/27017'\n
-                          exitCode=$?\n
+                  while true;\n
+                  do\n
+                      timeout 1 bash -c 'cat < /dev/null > /dev/tcp/localhost/27017'\n
+                      exitCode=$?\n
 
-                          if [ $exitCode = 0 ]; then\n
-                              otherNodeCount=`getent hosts \\`hostname -d\\` | wc -l`\n
-                              myip=`hostname -i`\n
+                      if [ $exitCode = 0 ]; then\n
+                          otherNodeCount=`getent hosts \\`hostname -d\\` | wc -l`\n
+                          myip=`hostname -i`\n
 
-                              if [ $otherNodeCount = 0 ]; then\n
-                                  mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} localhost --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js\n
-                              else\n
-                                  mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.add(\\\"`hostname -i`\\\")\"\n
-                              fi\n
-                              break\n
+                          if [ $otherNodeCount = 0 ]; then\n
+                              mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} localhost --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js\n
+                          else\n
+                              mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.add(\\\"`hostname -i`\\\")\"\n
                           fi\n
-                          sleep 1s\n
-                      done\n
-                    "]
-                preStop:
-                  exec:
-                    command: ["/bin/sh", "-c", "
-                      set -x\n
-                      mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.remove(\\\"`hostname -i`:27017\\\")\"\n
-                    "]
+                          break\n
+                      fi\n
+                      sleep 1s\n
+                  done\n
+                "]
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "
+                  set -x\n
+                  mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.remove(\\\"`hostname -i`:27017\\\")\"\n
+                "]
       volumes:
         - name: mongodb-key
           secret:
