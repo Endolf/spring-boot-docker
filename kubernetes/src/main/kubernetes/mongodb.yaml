@@ -108,7 +108,7 @@ spec:
             chown 999:999 /data/db/mongo-key\n
           "]
           volumeMounts:
-            - name: mongo-persistent-storage
+            - name: data-storage
               mountPath: /data/db
             - name: mongodb-key
               mountPath: /key
@@ -119,7 +119,7 @@ spec:
             - containerPort: 27017
               name: mongo
           volumeMounts:
-            - name: mongo-persistent-storage
+            - name: data-storage
               mountPath: /data/db
             - name: mongodb-setup
               mountPath: /data/scripts
@@ -188,7 +188,7 @@ spec:
               mode: 0644
   volumeClaimTemplates:
     - metadata:
-        name: mongo-persistent-storage
+        name: data-storage
       spec:
         accessModes:
           - ReadWriteOnce
