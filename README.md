@@ -11,6 +11,7 @@ Based on a number of resources including
 * [Mongo internal authentication](https://docs.mongodb.com/v3.0/tutorial/enable-internal-authentication/)
 * [RabbitMQ Clustering](https://www.rabbitmq.com/clustering.html)
 * [RabbitMQ on Kubernetes](https://wesmorgan.svbtle.com/rabbitmq-cluster-on-kubernetes-with-statefulsets)
+* [Cassandra cluster made easy](http://node.mu/2015/09/18/multi-node-cassandra-cluster-made-easy-with-kubernetes/)
 
 ### Run
 #### Setup
@@ -26,6 +27,7 @@ After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` 
 
 * To deploy the MariaDB database ```kubectl create -f kubernetes/target/kubernetes/mariadb.yaml```
 * To deploy the Mongo database ```kubectl create -f kubernetes/target/kubernetes/mongodb.yaml```
+* To deploy the Cassandra database ```kubectl create -f kubernetes/target/kubernetes/cassandra.yaml```
 * To deploy the application ```kubectl create -f kubernetes/target/kubernetes/app.yaml```
 * To deploy the application service ```kubectl create -f kubernetes/target/kubernetes/app-service.yaml```
 
@@ -39,6 +41,7 @@ To access the app visit the url specified by ```minikube service spring-boot-app
 ### Cleanup
 * Delete the app service ```kubectl delete -f kubernetes/target/kubernetes/app-service.yaml```
 * Delete the app ```kubectl delete -f kubernetes/target/kubernetes/app.yaml```
+* Delete the Cassandra database nodes ```kubectl delete -f kubernetes/target/kubernetes/cassandra.yaml```
 * Delete the Mongo database nodes ```kubectl delete -f kubernetes/target/kubernetes/mongodb.yaml```
 * Delete the MariaDB database nodes ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
 
