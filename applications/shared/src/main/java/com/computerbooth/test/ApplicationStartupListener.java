@@ -14,11 +14,11 @@ import java.time.Instant;
 @Component
 public class ApplicationStartupListener implements ApplicationListener<ApplicationReadyEvent> {
     private final Logger logger = LoggerFactory.getLogger(ApplicationStartupListener.class);
-    private MessageRepository messageRepository;
+    private Application.AMQPGateway gateway;
 
     @Autowired
-    public void setMessageRepository(MessageRepository repo) {
-        this.messageRepository = repo;
+    public void setGateway(Application.AMQPGateway gateway) {
+        this.gateway = gateway;
     }
 
     @Override
@@ -39,6 +39,7 @@ public class ApplicationStartupListener implements ApplicationListener<Applicati
         }
         String messageText = messageTextBuilder.toString();
         logger.info(messageText);
-        messageRepository.save(new Message(Instant.now(), messageText));
+        Message message = new Message(Instant.now(), messageText);
+        gateway.sendToQueue(message);
     }
 }

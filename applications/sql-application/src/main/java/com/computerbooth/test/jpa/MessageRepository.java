@@ -1,4 +1,4 @@
-package com.computerbooth.test;
+package com.computerbooth.test.jpa;
 
 import org.springframework.data.repository.CrudRepository;
 
