@@ -19,7 +19,7 @@ metadata:
   name: cassandra
 spec:
   serviceName: cassandra
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:

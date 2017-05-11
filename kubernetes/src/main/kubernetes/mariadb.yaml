@@ -119,7 +119,7 @@ metadata:
   name: mariadb
 spec:
   serviceName: mariadb
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
