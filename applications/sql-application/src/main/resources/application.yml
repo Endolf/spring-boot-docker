@@ -13,6 +13,8 @@ spring:
     host: localhost
     port: 5672
 management.security.enabled: false
+server:
+  port: 8100
 ---
 
 spring:
@@ -27,3 +29,7 @@ spring:
 
   rabbitmq:
     host: ${RABBITMQ_HOST}
+
+server:
+  port: 80
+
