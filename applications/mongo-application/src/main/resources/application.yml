@@ -1,0 +1,14 @@
+spring:
+  application.name: "Mongo test application"
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+management.security.enabled: false
+---
+
+spring:
+  profiles: production
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
