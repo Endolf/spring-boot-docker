@@ -1,8 +1,9 @@
 package com.computerbooth.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -16,58 +17,44 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.amqp.Amqp;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.util.StringUtils;
 
 @SpringBootApplication
 @IntegrationComponentScan
 @PropertySource("classpath:application.yml")
 public class Application {
 
-    @Value("${rabbitMQServerAddresses:127.0.0.1}")
-    private String rabbitMQServerAddresses;
+    private final Logger logger = LoggerFactory.getLogger(Application.class);
 
-    @Value("${rabbitMQExchangeName:}")
-    private String rabbitMQExchangeName;
+    @Value("${amqp.exchangeName:}")
+    private String mqExchangeName;
 
-    @Value("${rabbitMQRoutingKey:test}")
-    private String rabbitMQRoutingKey;
-
-    @Value("${rabbitMQUsername:}")
-    private String rabbitMQUsername;
-
-    @Value("${rabbitMQPassword:}")
-    private String rabbitMQPassword;
-
-    @Bean
-    AmqpTemplate amqpTemplate() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-        connectionFactory.setAddresses(rabbitMQServerAddresses);
-        if(!StringUtils.isEmpty(rabbitMQUsername)) {
-            connectionFactory.setUsername(rabbitMQUsername);
-            if(!StringUtils.isEmpty(rabbitMQPassword)) {
-                connectionFactory.setPassword(rabbitMQPassword);
-            }
-        }
-        return new RabbitTemplate(connectionFactory);
-    }
+    @Value("${amqp.routingKey:test}")
+    private String mqRoutingKey;
 
     @Bean
     @Autowired
     public IntegrationFlow amqpOutbound(AmqpTemplate amqpTemplate) {
         return IntegrationFlows.from(amqpOutboundChannel())
                 .handle(Amqp.outboundAdapter(amqpTemplate)
-                        .exchangeName(rabbitMQExchangeName)
-                        .routingKey(rabbitMQRoutingKey))
+                        .exchangeName(mqExchangeName)
+                        .routingKey(mqRoutingKey))
                 .get();
     }
 
+    @Bean
+    @Autowired
+    public IntegrationFlow amqpInbound(ConnectionFactory connectionFactory) {
+        return IntegrationFlows.from(Amqp.inboundAdapter(connectionFactory, mqRoutingKey))
+                .channel("amqpInboundChannel")
+                .get();
+    }
     @Bean
     public MessageChannel amqpOutboundChannel() {
         return new DirectChannel();
     }
 
     @MessagingGateway(defaultRequestChannel = "amqpOutboundChannel")
-    public interface AMQPGateway {
+    public interface AMQPEndpoint {
         void sendToQueue(Message data);
     }
 

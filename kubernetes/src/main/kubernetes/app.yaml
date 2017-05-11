@@ -65,3 +65,5 @@ spec:
               value: org.mariadb.jdbc.Driver
             - name: DB_DIALECT
               value: org.hibernate.dialect.MySQL5InnoDBDialect
+            - name: RABBITMQ_HOST
+              value: rabbitmq

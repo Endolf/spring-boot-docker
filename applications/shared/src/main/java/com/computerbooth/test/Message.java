@@ -9,6 +9,10 @@ public class Message implements Serializable {
     private Instant timestamp;
     private String message;
 
+    protected Message() {
+        id = UUID.randomUUID();
+    }
+
     public Message(Instant timestamp, String message) {
         this.id = UUID.randomUUID();
         this.timestamp = timestamp;
@@ -29,6 +33,6 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        return timestamp + ": " + id + ": " + message;
+        return "Timestamp: " + getTimestamp() + ", ID: " + getId() + ", message: \"" + getMessage() + "\"";
     }
 }

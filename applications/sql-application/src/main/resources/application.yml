@@ -7,17 +7,21 @@ spring:
 
   jpa.hibernate.ddl-auto: update
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+management.security.enabled: false
 ---
 
 spring:
-    profiles: production
-    datasource:
-        url: ${DB_URI}
-        username: ${DB_USER}
-        password: ${DB_PASSWORD}
-        driverclassName: ${DB_DRIVER}
+  profiles: production
+  datasource:
+    url: ${DB_URI}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driverclassName: ${DB_DRIVER}
 
-    jpa:
-        properties:
-            hibernate:
-                dialect: ${DB_DIALECT}
+  jpa.properties.hibernate.dialect: ${DB_DIALECT}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
