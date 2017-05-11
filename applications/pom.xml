@@ -26,5 +26,6 @@
     <modules>
         <module>shared</module>
         <module>sql-application</module>
+        <module>mongo-application</module>
     </modules>
 </project>

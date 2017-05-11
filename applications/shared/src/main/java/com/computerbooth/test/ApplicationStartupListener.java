@@ -3,6 +3,7 @@ package com.computerbooth.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,9 @@ public class ApplicationStartupListener implements ApplicationListener<Applicati
     private final Logger logger = LoggerFactory.getLogger(ApplicationStartupListener.class);
     private Application.AMQPEndpoint amqpEndpoint;
 
+    @Value("${spring.application.name}")
+    private String name;
+
     @Autowired
     public void setAMQPEndpoint(Application.AMQPEndpoint gateway) {
         this.amqpEndpoint = gateway;
@@ -25,11 +29,9 @@ public class ApplicationStartupListener implements ApplicationListener<Applicati
     public void onApplicationEvent(ApplicationReadyEvent event) {
         StringBuilder messageTextBuilder = new StringBuilder()
                 .append("Application started: \"")
-                .append(event.getApplicationContext().getId())
+                .append(name)
                 .append("\" at ")
-                .append(event.getTimestamp())
-                .append(" by ")
-                .append(event.getSource());
+                .append(event.getTimestamp());
         try {
             String hostname = InetAddress.getLocalHost().getHostName();
             messageTextBuilder.append(" on ")

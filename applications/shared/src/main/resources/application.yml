@@ -1,4 +1,8 @@
-spring.rabbitmq:
-  host: localhost
-  port: 5672
+spring:
+  application.name: "Core test application"
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+
 management.security.enabled: false
