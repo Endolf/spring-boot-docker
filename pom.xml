@@ -19,6 +19,7 @@
         <java.version>1.8</java.version>
         <docker.image.prefix>computerbooth</docker.image.prefix>
         <findbugs-maven-plugin.version>3.0.4</findbugs-maven-plugin.version>
+        <maven-pmd-plugin.version>3.7</maven-pmd-plugin.version>
     </properties>
 
     <modules>
@@ -83,8 +84,7 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>${maven-project-info-reports-plugin.version}</version>
+                    <artifactId>maven-source-plugin</artifactId>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -118,5 +118,58 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <!-- FindBugs Static Analysis -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <onlyAnalyze>com.computerbooth.-</onlyAnalyze>
+                    <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
+                    <!-- Enables analysis which takes more memory but finds more bugs. If
+                    you run out of memory, changes the value of the effort element to 'Low'. -->
+                    <effort>Max</effort>
+                    <!-- Build fails if problems are found -->
+                    <failOnError>true</failOnError>
+                    <!-- Reports all bugs (other values are medium and max) -->
+                    <threshold>Low</threshold>
+                    <!-- Produces XML report -->
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${maven-pmd-plugin.version}</version>
+                <configuration>
+                    <rulesets>
+                        <!-- This is the default ruleset with some exclusions -->
+                        <ruleset>/rulesets/java/basic.xml</ruleset>
+                        <ruleset>/rulesets/java/empty.xml</ruleset>
+                        <ruleset>/rulesets/java/imports.xml</ruleset>
+                        <ruleset>/rulesets/java/unusedcode.xml</ruleset>
+                        <ruleset>/rulesets/java/unnecessary.xml</ruleset>
+                    </rulesets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                            <!-- Finding duplicate code with PMD's Copy/Paste Detector (CPD) tool. -->
+                            <goal>cpd-check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

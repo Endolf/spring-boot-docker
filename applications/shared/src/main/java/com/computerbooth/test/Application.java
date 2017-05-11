@@ -1,7 +1,5 @@
 package com.computerbooth.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -25,8 +23,6 @@ import org.springframework.messaging.MessageChannel;
 @IntegrationComponentScan
 @PropertySource("classpath:application.yml")
 public class Application {
-
-    private final Logger logger = LoggerFactory.getLogger(Application.class);
 
     @Value("${amqp.exchangeName:com.computerbooth.poc}")
     private String mqExchangeName;

@@ -1,5 +1,7 @@
 package com.computerbooth.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -13,12 +15,14 @@ import java.net.UnknownHostException;
 
 @ControllerAdvice
 public class HostnameHeaderControllerAdvice implements ResponseBodyAdvice<Object> {
+    private final Logger logger = LoggerFactory.getLogger(HostnameHeaderControllerAdvice.class);
     private String host = "unknown";
 
     public HostnameHeaderControllerAdvice() {
         try {
             this.host = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
+            logger.debug("Unable to get hostname", e);
         }
     }
 
