@@ -2,14 +2,11 @@ package com.computerbooth.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -42,14 +39,12 @@ public class Application {
 
     @Bean
     public TopicExchange topicExchange() {
-        TopicExchange exchange = new TopicExchange(mqExchangeName);
-        return exchange;
+        return new TopicExchange(mqExchangeName);
     }
 
     @Bean
     public Queue inboundQueue() {
-        Queue queue = new Queue(mqExchangeName + "." + mqRoutingKey + "." + name);
-        return queue;
+        return new Queue(mqExchangeName + "." + mqRoutingKey + "." + name);
     }
 
     @Bean

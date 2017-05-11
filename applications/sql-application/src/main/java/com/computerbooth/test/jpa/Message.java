@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 public class Message implements Serializable {
+    private static final long serialVersionUID = -8630559334559235690L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(updatable = false, nullable = false, columnDefinition = "BINARY(16)")

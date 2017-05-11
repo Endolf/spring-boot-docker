@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class Message implements Serializable {
+    private static final long serialVersionUID = -4674375064607274784L;
+
     private UUID id;
     private Instant timestamp;
     private String message;
