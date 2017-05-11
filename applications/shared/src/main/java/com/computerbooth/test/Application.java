@@ -37,6 +37,9 @@ public class Application {
     @Value("${amqp.routingKey:test}")
     private String mqRoutingKey;
 
+    @Value("${spring.application.name}")
+    private String name;
+
     @Bean
     public TopicExchange topicExchange() {
         TopicExchange exchange = new TopicExchange(mqExchangeName);
@@ -45,7 +48,7 @@ public class Application {
 
     @Bean
     public Queue inboundQueue() {
-        Queue queue = new Queue(mqExchangeName + "." + mqRoutingKey);
+        Queue queue = new Queue(mqExchangeName + "." + mqRoutingKey + "." + name);
         return queue;
     }
 
