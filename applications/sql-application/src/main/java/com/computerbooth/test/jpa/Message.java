@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-public class Message extends com.computerbooth.test.Message {
+public class Message implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(updatable = false, nullable = false, columnDefinition = "BINARY(16)")
@@ -33,18 +33,20 @@ public class Message extends com.computerbooth.test.Message {
         this.message = message;
     }
 
-    @Override
     public Instant getTimestamp() {
         return timestamp;
     }
 
-    @Override
     public String getMessage() {
         return message;
     }
 
-    @Override
     public UUID getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Timestamp: " + getTimestamp() + ", ID: " + getId() + ", message: \"" + getMessage() + "\"";
     }
 }

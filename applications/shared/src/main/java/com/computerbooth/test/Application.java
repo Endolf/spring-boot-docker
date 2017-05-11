@@ -2,7 +2,13 @@ package com.computerbooth.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +31,28 @@ public class Application {
 
     private final Logger logger = LoggerFactory.getLogger(Application.class);
 
-    @Value("${amqp.exchangeName:}")
+    @Value("${amqp.exchangeName:com.computerbooth.poc}")
     private String mqExchangeName;
 
     @Value("${amqp.routingKey:test}")
     private String mqRoutingKey;
+
+    @Bean
+    public TopicExchange topicExchange() {
+        TopicExchange exchange = new TopicExchange(mqExchangeName);
+        return exchange;
+    }
+
+    @Bean
+    public Queue inboundQueue() {
+        Queue queue = new Queue(mqExchangeName + "." + mqRoutingKey);
+        return queue;
+    }
+
+    @Bean
+    public Binding binding() {
+        return BindingBuilder.bind(inboundQueue()).to(topicExchange()).with(mqRoutingKey);
+    }
 
     @Bean
     @Autowired
@@ -41,13 +64,6 @@ public class Application {
                 .get();
     }
 
-    @Bean
-    @Autowired
-    public IntegrationFlow amqpInbound(ConnectionFactory connectionFactory) {
-        return IntegrationFlows.from(Amqp.inboundAdapter(connectionFactory, mqRoutingKey))
-                .channel("amqpInboundChannel")
-                .get();
-    }
     @Bean
     public MessageChannel amqpOutboundChannel() {
         return new DirectChannel();
