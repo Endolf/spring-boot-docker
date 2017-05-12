@@ -13,7 +13,6 @@ import java.util.UUID;
 public class Message implements Serializable {
     private static final long serialVersionUID = -8630559334559235690L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(updatable = false, nullable = false, columnDefinition = "BINARY(16)")
     private UUID id;
     @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP(3)")
@@ -30,6 +29,7 @@ public class Message implements Serializable {
     }
 
     public Message(Instant timestamp, String message) {
+        this.id = UUID.randomUUID();
         this.timestamp = timestamp;
         this.message = message;
     }

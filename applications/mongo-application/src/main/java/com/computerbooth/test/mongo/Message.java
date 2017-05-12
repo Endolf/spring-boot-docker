@@ -22,6 +22,7 @@ public class Message {
     }
 
     public Message(Instant timestamp, String message) {
+        this.id = UUID.randomUUID();
         this.timestamp = timestamp;
         this.message = message;
     }
