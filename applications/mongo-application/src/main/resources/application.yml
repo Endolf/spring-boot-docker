@@ -13,5 +13,10 @@ spring:
 
   rabbitmq:
     host: ${RABBITMQ_HOST}
+  data:
+    mongodb:
+      authentication-database: ${MONGO_AUTHENTICATION_DATABASE}
+      uri: ${MONGO_URI}
+
 server:
   port: 80
