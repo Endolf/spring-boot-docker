@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +30,9 @@ public class MessageProcessor {
 
     @Bean
     @Autowired
-    public IntegrationFlow amqpInbound(ConnectionFactory connectionFactory) {
-        return IntegrationFlows.from(Amqp.inboundAdapter(connectionFactory, inboundQueue))
+    public IntegrationFlow amqpInbound(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
+        return IntegrationFlows.from(Amqp.inboundAdapter(connectionFactory, inboundQueue)
+                    .messageConverter(messageConverter))
                 .channel("amqpInboundChannel")
                 .get();
     }
@@ -40,7 +42,7 @@ public class MessageProcessor {
         return IntegrationFlows.from("amqpInboundChannel")
                 .<com.computerbooth.test.Message, Message>transform(source -> new Message(source))
                 .<Message>handle((payload, headers) -> repository.save(payload))
-                .<Message>handle(message -> logger.info("Processed message: {}", message.getPayload()))
+                .handle(message -> logger.info("Processed message: {}", message.getPayload()))
                 .get();
     }
 }
