@@ -17,6 +17,7 @@ Based on a number of resources including
 #### Setup
 * To start a local Kubernetes cluster ```minikube start```.
 * Enable heapster for CPU monitoring for autoscaling ```minikube addons enable heapster```
+* Enable the ingress plugin for routing ```minikube addons enable ingress```
 * You can confirm it's running with ```kubectl cluster-info``` and ```minikube service --namespace=kube-system monitoring-grafana --url``` to see the monitoring dashboard.
 * To setup ```kubectl``` to use the right cluster run ```kubectl config use-context minikube```
 * To setup docker to use the docker containers in the cluster use ```eval $(minikube docker-env)``` 
