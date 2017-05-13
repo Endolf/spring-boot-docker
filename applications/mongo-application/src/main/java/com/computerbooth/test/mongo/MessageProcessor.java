@@ -9,7 +9,7 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 
 @Configuration
-public class MessageProcessor{
+public class MessageProcessor {
     private Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
     private MessageRepository repository;
 
