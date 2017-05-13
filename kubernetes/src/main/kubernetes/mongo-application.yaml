@@ -68,14 +68,15 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: production
-            - name: MONGO_AUTHENTICATION_DATABASE
-              value: ${MONGO_ADMIN_DATABASE}
-            - name: MONGO_URI
-              value: mongodb://${MONGO_ADMIN_USER}:$(MONGO_PASSWORD)@${MONGO_HOST}/testdb?replicaSet=${MONGO_RS}
             - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mongodb-secrets
                   key: MONGO_ADMIN_PASSWORD
+            - name: MONGO_URI
+              value: "mongodb://$(MONGO_ADMIN_USERNAME):$(MONGO_PASSWORD)@mongodb/$(MONGO_ADMIN_DATABASE)?replicaSet=$(MONGO_RS)"
+            - name: MONGO_DATABASE
+              value: "testdb"
             - name: RABBITMQ_HOST
               value: rabbitmq
+#          command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]

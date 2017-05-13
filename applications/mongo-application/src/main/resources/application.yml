@@ -15,8 +15,8 @@ spring:
     host: ${RABBITMQ_HOST}
   data:
     mongodb:
-      authentication-database: ${MONGO_AUTHENTICATION_DATABASE}
       uri: ${MONGO_URI}
+      database: ${MONGO_DATABASE}
 
 server:
   port: 80
