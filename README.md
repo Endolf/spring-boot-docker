@@ -17,7 +17,7 @@ Based on a number of resources including
 #### Setup
 * To start a local Kubernetes cluster ```minikube start```.
 * Enable heapster for CPU monitoring for autoscaling ```minikube addons enable heapster```
-* Enable the ingress plugin for routing ```minikube addons enable ingress```
+* Enable the ingress plugin for HTTP routing ```minikube addons enable ingress```
 * You can confirm it's running with ```kubectl cluster-info``` and ```minikube service --namespace=kube-system monitoring-grafana --url``` to see the monitoring dashboard.
 * To setup ```kubectl``` to use the right cluster run ```kubectl config use-context minikube```
 * To setup docker to use the docker containers in the cluster use ```eval $(minikube docker-env)``` 
@@ -26,30 +26,34 @@ Based on a number of resources including
 #### Deployment
 After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` to confirm the step.
 
-* To deploy the MariaDB database ```kubectl create -f kubernetes/target/kubernetes/mariadb.yaml```
-* To deploy the Mongo database ```kubectl create -f kubernetes/target/kubernetes/mongodb.yaml```
-* To deploy the Cassandra database ```kubectl create -f kubernetes/target/kubernetes/cassandra.yaml```
-* To deploy the application ```kubectl create -f kubernetes/target/kubernetes/app.yaml```
-* To deploy the application service ```kubectl create -f kubernetes/target/kubernetes/app-service.yaml```
+* To deploy the MariaDB database ```kubectl apply -f kubernetes/target/kubernetes/mariadb.yaml```
+* To deploy the Mongo database ```kubectl apply -f kubernetes/target/kubernetes/mongodb.yaml```
+* To deploy the Cassandra database ```kubectl apply -f kubernetes/target/kubernetes/cassandra.yaml```
 
-To access the app visit the url specified by ```minikube service spring-boot-app --url```, add ```/messages``` to the end to see the messages.
+* To deploy RabbitMQ ```kubectl apply -f kubernetes/target/kubernetes/rabbitmq.yaml```
 
-#### Redeploy
-* Build the new version ```mvn clean package```
-* Delete the old app ```kubectl delete -f kubernetes/target/kubernetes/app.yaml```
-* Deploy the new version ```kubectl create -f kubernetes/target/kubernetes/app.yaml```
+* To deploy the SQL application ```kubectl apply -f kubernetes/target/kubernetes/sql-application.yaml```
+* To deploy the Mongo application ```kubectl apply -f kubernetes/target/kubernetes/mongo-application.yaml```
+* To deploy the ingress service ```kubectl apply -f kubernetes/target/kubernetes/ingress-service.yaml```
+
+To access the app visit the url specified by ```minikube ip```, add ```mariadb/messages``` or ```mongo/messages``` to the end to see the messages.
 
 ### Cleanup
-* Delete the app service ```kubectl delete -f kubernetes/target/kubernetes/app-service.yaml```
-* Delete the app ```kubectl delete -f kubernetes/target/kubernetes/app.yaml```
-* Delete the Cassandra database nodes ```kubectl delete -f kubernetes/target/kubernetes/cassandra.yaml```
-* Delete the Mongo database nodes ```kubectl delete -f kubernetes/target/kubernetes/mongodb.yaml```
-* Delete the MariaDB database nodes ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
+* To undeploy the ingress service ```kubectl delete -f kubernetes/target/kubernetes/ingress-service.yaml```
+* To undeploy the SQL application ```kubectl delete -f kubernetes/target/kubernetes/sql-application.yaml```
+* To undeploy the Mongo application ```kubectl delete -f kubernetes/target/kubernetes/mongo-application.yaml```
+
+* To undeploy RabbitMQ ```kubectl delete -f kubernetes/target/kubernetes/rabbitmq.yaml```
+
+* To undeploy the MariaDB database ```kubectl delete -f kubernetes/target/kubernetes/mariadb.yaml```
+* To undeploy the Mongo database ```kubectl delete -f kubernetes/target/kubernetes/mongodb.yaml```
+* To undeploy the Cassandra database ```kubectl delete -f kubernetes/target/kubernetes/cassandra.yaml```
 
 then ```kubectl get all,endpoints,pvc,pv``` to confirm.
 
 Use the Kubernetes dashboard to delete the persistent volumes or 
-* Delete the Mongo persistent claims ```kubectl get pvc | cut -d " " -f1 | grep -v -e "^NAME$" | grep -e "-mongo-" | xargs kubectl delete pvc```
+* Delete the Mongo persistent claims ```kubectl get pvc | cut -d " " -f1 | grep -v -e "^NAME$" | grep -e "-mongodb-" | xargs kubectl delete pvc```
+* Delete the Cassandra persistent claims ```kubectl get pvc | cut -d " " -f1 | grep -v -e "^NAME$" | grep -e "-cassandra-" | xargs kubectl delete pvc```
 * Delete the MariaDB persistent claims ```kubectl get pvc | cut -d " " -f1 | grep -v -e "^NAME$" | grep -e "-mariadb-" | xargs kubectl delete pvc```
 * Delete the RabbitMQ persistent claims ```kubectl get pvc | cut -d " " -f1 | grep -v -e "^NAME$" | grep -e "-rabbitmq-" | xargs kubectl delete pvc```
 
