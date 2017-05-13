@@ -79,4 +79,9 @@ spec:
               value: "testdb"
             - name: RABBITMQ_HOST
               value: rabbitmq
-#          command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 3

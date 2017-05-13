@@ -83,3 +83,9 @@ spec:
               value: org.hibernate.dialect.MySQL5InnoDBDialect
             - name: RABBITMQ_HOST
               value: rabbitmq
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 3
