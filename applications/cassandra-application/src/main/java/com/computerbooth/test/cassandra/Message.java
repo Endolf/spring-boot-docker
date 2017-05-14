@@ -1,5 +1,7 @@
 package com.computerbooth.test.cassandra;
 
+import com.datastax.driver.core.DataType;
+import org.springframework.data.cassandra.mapping.CassandraType;
 import org.springframework.data.cassandra.mapping.PrimaryKey;
 import org.springframework.data.cassandra.mapping.Table;
 
@@ -9,6 +11,7 @@ import java.util.UUID;
 @Table
 public class Message {
     @PrimaryKey
+    @CassandraType(type = DataType.Name.UUID)
     private UUID id;
     private Instant timestamp;
     private String message;
