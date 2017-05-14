@@ -170,7 +170,10 @@ spec:
               exec:
                 command: ["/bin/sh", "-c", "
                   set -x\n
-                  mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.remove(\\\"`hostname -i`:27017\\\")\"\n
+                  otherNodeCount=`getent hosts \\`hostname -d\\` | wc -l`\n
+                  if [ $otherNodeCount -gt 1 ]; then\n
+                      mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.remove(\\\"`hostname -i`:27017\\\")\"\n
+                  fi\n
                 "]
       volumes:
         - name: mongodb-key
