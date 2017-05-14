@@ -1,0 +1,25 @@
+spring:
+  application.name: "Cassandra test application"
+  rabbitmq:
+    host: localhost
+    port: 5672
+  data:
+    cassandra:
+      schema-action: create_if_not_exists
+management.security.enabled: false
+server:
+  port: 8090
+---
+spring:
+  profiles: production
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+  data:
+    cassandra:
+      cluster-name: ${CASSANDRA_CLUSTER_NAME}
+      contact-points: ${CASSANDRA_CONTACT_POINT}
+      keyspace-name: ${CASSANDRA_KEYSPACE_NAME}
+
+server:
+  port: 80

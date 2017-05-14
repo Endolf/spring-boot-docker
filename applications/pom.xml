@@ -27,5 +27,6 @@
         <module>shared</module>
         <module>sql-application</module>
         <module>mongo-application</module>
+        <module>cassandra-application</module>
     </modules>
 </project>
