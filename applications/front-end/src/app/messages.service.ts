@@ -62,12 +62,14 @@ export class MessagesService {
       .map((response: Response) => {
         let body = response.json();
         console.log("Got data:", body);
-        return (body._embedded.messages || []).map((value) => {
+        this.messages = this.messages.filter((value) => value.source!=environment.messageServiceURLs[1].source);
+        this.messages = this.messages.concat((body._embedded.messages || []).map((value) => {
           value.source = environment.messageServiceURLs[1].source;
           let linkElements = value._links.self.href.split("/");
           value.id = linkElements[linkElements.length-1];
           return value;
-        });
+        }));
+        return this.messages;
       })
       .catch(this.handleError);
   }
