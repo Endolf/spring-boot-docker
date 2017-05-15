@@ -21,6 +21,11 @@
         <td>{{message.id}}</td>
         <td>{{message.message}}</td>
       </tr>
+      <tr *ngIf="!messages.length">
+        <td colspan="4" class="text-center">
+          No data.
+        </td>
+      </tr>
       </tbody>
     </table>
   </div>

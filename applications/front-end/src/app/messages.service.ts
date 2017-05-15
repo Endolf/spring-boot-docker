@@ -6,7 +6,6 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/throw';
-import 'rxjs/add/observable/concat';
 import 'rxjs/add/observable/merge';
 
 @Injectable()
@@ -39,6 +38,7 @@ export class MessagesService {
   }
 
   private handleError (error: Response | any) {
+    console.error("Error", error);
     let errMsg: string;
     if (error instanceof Response) {
       const body = error.json() || '';

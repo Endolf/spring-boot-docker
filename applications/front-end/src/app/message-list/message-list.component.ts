@@ -24,7 +24,7 @@ export class MessageListComponent implements OnInit {
           }
         }
       ),
-      error =>  this.errorMessage = <any>error);
+      error =>  this.errorMessage = "Failed to get messages");
   }
 
 }
