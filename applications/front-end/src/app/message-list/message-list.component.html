@@ -1,0 +1,27 @@
+<ngb-alert [dismissible]="false" type="success">Hello</ngb-alert>
+
+<div class="card">
+  <div class="card-header">
+    Messages
+  </div>
+  <div class="card-block">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Source</th>
+        <th>ID</th>
+        <th>Message</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let message of messages">
+        <td>{{message.timestamp | date: "medium"}}</td>
+        <td>{{message.source}}</td>
+        <td>{{message.id}}</td>
+        <td>{{message.message}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

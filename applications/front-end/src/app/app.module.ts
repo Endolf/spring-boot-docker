@@ -6,10 +6,12 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { MessageListComponent } from './message-list/message-list.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MessageListComponent
   ],
   imports: [
     BrowserModule,
