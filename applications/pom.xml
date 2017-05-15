@@ -28,5 +28,6 @@
         <module>sql-application</module>
         <module>mongo-application</module>
         <module>cassandra-application</module>
+        <module>front-end</module>
     </modules>
 </project>

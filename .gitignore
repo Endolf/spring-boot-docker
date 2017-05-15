@@ -1,3 +1,6 @@
 *.iml
 .idea/
 target/
+node/
+node_modules/
+etc/
