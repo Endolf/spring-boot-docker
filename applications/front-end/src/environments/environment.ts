@@ -4,5 +4,8 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  name: "dev",
+
+  messageServiceURLs: [{url: "http://localhost:8090/messages", source: "mongodb"},{url: "http://172.17.0.1:8100/messages", source: "mariadb"}]
 };

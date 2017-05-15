@@ -10,19 +10,21 @@ import {Message, MessagesService} from "../messages.service";
 export class MessageListComponent implements OnInit {
 
   private messages: Message[] = [];
+  private errorMessage: string;
 
   constructor(private service: MessagesService) {}
 
   ngOnInit() {
-    this.messages = this.service.getMessages();
-    this.messages.sort((a, b) => {
-        if(a.timestamp === b.timestamp) {
-          return b.source > a.source?-1:1;
-        } else {
-          return a.timestamp > b.timestamp?-1:1;
+    this.service.getMessages().subscribe(
+      messages => this.messages = messages.sort((a, b) => {
+          if(a.timestamp === b.timestamp) {
+            return b.source > a.source?-1:1;
+          } else {
+            return a.timestamp > b.timestamp?-1:1;
+          }
         }
-      }
-    )
+      ),
+      error =>  this.errorMessage = <any>error);
   }
 
 }
