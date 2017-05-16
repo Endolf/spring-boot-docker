@@ -54,7 +54,7 @@
                       <dockerDirectory>${project.basedir}/docker</dockerDirectory>
                       <resources>
                         <resource>
-                          <directory>${project.basedir}</directory>
+                          <directory>${project.build.directory}</directory>
                           <include>dist/**/*</include>
                         </resource>
                       </resources>
