@@ -57,19 +57,25 @@ data:
   create-rs: |
     var rsStatus = rs.status();
     if(rsStatus.ok==0) {
-        rs.initiate({_id : myrs, members: [{ _id : 0, host : myip}]});
+        if(rsStatus.stateStr=="REMOVED") {
+            rsconf = rs.conf();
+            rsconf.members=[{"_id":0, "host": myip}];
+            rs.reconfig(rsconf, {force: true});
+        } else {
+            rs.initiate({_id : myrs, members: [{ _id : 0, host : myip}]});
 
-        startTime = new ISODate().valueOf();
-        while(((new ISODate().valueOf() - startTime) < 30000) && !rs.isMaster().ismaster) {
-            sleep(100);
+            startTime = new ISODate().valueOf();
+            while(((new ISODate().valueOf() - startTime) < 30000) && !rs.isMaster().ismaster) {
+                sleep(100);
+            }
+
+            db = db.getSiblingDB(adminDatabase);
+            db.createUser({
+                user: adminUser,
+                pwd: adminPassword,
+                roles: [ { role: 'root', db: adminDatabase } ]
+            });
         }
-
-        db = db.getSiblingDB(adminDatabase);
-        db.createUser({
-            user: adminUser,
-            pwd: adminPassword,
-            roles: [ { role: 'root', db: adminDatabase } ]
-        });
     } else if(rsStatus.ok==1) {
 
         aliveMembers = rsStatus.members.filter(function(statusMember){
@@ -156,8 +162,8 @@ spec:
                           myip=`hostname -i`\n
 
                           if [ $otherNodeCount = 0 ]; then\n
-                              mongo ${myip} --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js ||\n
-                              mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} ${myip} --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js\n
+                              mongo ${myip}/ --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js ||\n
+                              mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} ${myip}/ --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js\n
                           else\n
                               mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.add(\\\"`hostname -i`\\\")\"\n
                           fi\n
