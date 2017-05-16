@@ -36,9 +36,15 @@ After each of the following commands run ```kubectl get all,endpoints,pvc,pv``` 
 * To deploy the Mongo application ```kubectl apply -f kubernetes/target/kubernetes/mongo-application.yaml```
 * To deploy the ingress service ```kubectl apply -f kubernetes/target/kubernetes/ingress-service.yaml```
 
-To access the app visit the url specified by ```minikube ip```, add ```mariadb/messages``` or ```mongo/messages``` to the end to see the messages.
+* To deploy the front end ```kubectl apply -f kubernetes/target/kubernetes/front-end.yaml```
+
+To access the app visit the url specified by ```minikube ip``` to the end to see the messages.
+
+To run the development docker container for the live reloading of the angular front end ```docker run -it -v `pwd`/applications/front-end:/development computerbooth/front-end-dev```
 
 ### Cleanup
+* To undeploy the front end ```kubectl delete -f kubernetes/target/kubernetes/front-end.yaml```
+
 * To undeploy the ingress service ```kubectl delete -f kubernetes/target/kubernetes/ingress-service.yaml```
 * To undeploy the SQL application ```kubectl delete -f kubernetes/target/kubernetes/sql-application.yaml```
 * To undeploy the Mongo application ```kubectl delete -f kubernetes/target/kubernetes/mongo-application.yaml```
