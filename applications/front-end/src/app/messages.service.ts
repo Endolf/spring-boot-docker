@@ -84,7 +84,7 @@ export class MessagesService {
     } else {
       retval = Observable.create(observer => {
         let obs = environment.messageServiceURLs.map((serviceUrl) => this.getMessagesForSource(serviceUrl.url, serviceUrl.source));
-        let lastError = "";
+        let lastError;
         let completed = obs.map(() => false);
         obs.map((value, index) => value.subscribe(item => {
           observer.next(item);
