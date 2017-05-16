@@ -156,8 +156,8 @@ spec:
                           myip=`hostname -i`\n
 
                           if [ $otherNodeCount = 0 ]; then\n
-                              mongo localhost --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js ||\n
-                              mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} localhost --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js\n
+                              mongo ${myip} --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js ||\n
+                              mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} ${myip} --eval \"var myip=\\\"${myip}\\\", myrs=\\\"${MONGO_RS}\\\", adminDatabase=\\\"${MONGO_ADMIN_DATABASE}\\\", adminUser=\\\"${MONGO_ADMIN_USERNAME}\\\", adminPassword=\\\"${MONGO_ADMIN_PASSWORD}\\\"\" /data/scripts/create-rs.js\n
                           else\n
                               mongo -u ${MONGO_ADMIN_USERNAME} -p ${MONGO_ADMIN_PASSWORD} --authenticationDatabase ${MONGO_ADMIN_DATABASE} `hostname -d`/?replicaSet=${MONGO_RS} --eval \"rs.add(\\\"`hostname -i`\\\")\"\n
                           fi\n
