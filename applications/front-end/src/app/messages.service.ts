@@ -8,6 +8,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/defer';
 
 @Injectable()
 export class MessagesService {
@@ -63,7 +64,7 @@ export class MessagesService {
     return this.http.get(url)
       .map((response: Response) => {
         let body = response.json();
-        console.log("Got data:", body);
+        console.debug("Got data:", body);
         this.messages = this.messages.filter((value) => value.source!=source);
         this.messages = this.messages.concat((body._embedded.messages || []).map((value) => {
           value.source = source;
@@ -77,22 +78,42 @@ export class MessagesService {
   }
 
   public getMessages(): Observable<Message[]> {
-    let obs = environment.messageServiceURLs.map((serviceUrl) => this.getMessagesForSource(serviceUrl.url, serviceUrl.source));
-    obs.push(Observable.from([this.messages]));
-    return Observable.merge.apply(this, obs);
+    let retval:Observable<Message[]>;
+    if(environment.messageServiceURLs.length===0) {
+      retval = Observable.from([this.messages]);
+    } else {
+      retval = Observable.create(observer => {
+        let obs = environment.messageServiceURLs.map((serviceUrl) => this.getMessagesForSource(serviceUrl.url, serviceUrl.source));
+        let lastError = "";
+        let completed = obs.map(() => false);
+        obs.map((value, index) => value.subscribe(item => {
+          observer.next(item);
+        }, error => {
+          lastError = error;
+          completed[index] = true;
+        }, () => {
+          completed[index] = true;
+          if(completed.every(item => item===true)) {
+            if(lastError==null) {
+              observer.complete();
+            } else {
+              console.warn("Error getting messages", lastError);
+              observer.error(lastError);
+            }
+          }
+        }));
+      });
+    }
+    return retval;
   }
 
   private handleError (error: Response | any) {
-    console.error("Error", error);
     let errMsg: string;
     if (error instanceof Response) {
-      const body = error.json() || '';
-      const err = body.error || JSON.stringify(body);
-      errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
+      errMsg = `${error.status} - ${error.statusText || ''} ${error}`;
     } else {
       errMsg = error.message ? error.message : error.toString();
     }
-    console.error(errMsg);
     return Observable.throw(errMsg);
   }
 }

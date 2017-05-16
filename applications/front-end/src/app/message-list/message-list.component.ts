@@ -16,15 +16,20 @@ export class MessageListComponent implements OnInit {
 
   ngOnInit() {
     this.service.getMessages().subscribe(
-      messages => this.messages = messages.sort((a, b) => {
-          if(a.timestamp === b.timestamp) {
-            return b.source > a.source?-1:1;
-          } else {
-            return a.timestamp > b.timestamp?-1:1;
+      messages => {
+        this.messages = messages.sort((a, b) => {
+            if(a.timestamp === b.timestamp) {
+              return b.source > a.source?-1:1;
+            } else {
+              return a.timestamp > b.timestamp?-1:1;
+            }
           }
-        }
-      ),
-      error =>  this.errorMessage = "Failed to get messages");
+        )},
+          error =>  {
+            console.warn("Got error", error);
+            this.errorMessage = "Failed to get some messages";
+          }
+      );
   }
 
 }
