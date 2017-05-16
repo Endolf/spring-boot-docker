@@ -7,6 +7,7 @@ export const environment = {
   production: false,
   name: "dev",
 
-  // messageServiceURLs: [{url: "http://localhost:8090/messages", source: "mongodb"},{url: "http://172.17.0.1:8100/messages", source: "mariadb"}]
+  //messageServiceURLs: [{url: "http://localhost:8090/messages", source: "mongodb"},{url: "http://172.17.0.1:8100/messages", source: "mariadb"}]
+  //messageServiceURLs: [{url: "http://192.168.99.100/mongo/messages", source: "mongodb"},{url: "http://192.168.99.100/mariadb/messages", source: "mariadb"}, {url: "http://192.168.99.100/cassandra/messages", source: "cassandra"}]
   messageServiceURLs: []
 };
