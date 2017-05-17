@@ -1,0 +1,12 @@
+<ng-template #popContent>
+  <div *ngFor="let item of health" class="p-2 spring-health-status-{{(item.status || 'unknown').toLowerCase()}} container">
+    {{item.name}}: {{item.status}}
+    <div *ngFor="let detail of item.details" class="offset-2">
+      {{detail.name}}: {{detail.value}}
+    </div>
+  </div>
+</ng-template>
+<!--triggers="mouseenter:mouseleave"-->
+<div class="p-2 spring-health-status-{{(status || 'unknown').toLowerCase()}}" [ngbPopover]="popContent" placement="bottom">
+  {{name}}: {{status}}
+</div>

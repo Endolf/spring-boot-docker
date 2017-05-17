@@ -1,0 +1,10 @@
+@import '../../variables';
+
+:host {
+  .spring-health-status-up {
+    color: #00ff00;
+  }
+  .spring-health-status-down {
+    color: #ff0000;
+  }
+}

@@ -1,6 +1,9 @@
 <div class="container-fluid">
   <h1>
-    Message test ({{environmentName}})
+    Message test ({{environment.name}})
   </h1>
+  <div class="d-flex flex-row justify-content-center">
+    <app-spring-health *ngFor="let messageServiceUrl of environment.messageServiceURLs" [healthUrl]="messageServiceUrl.healthUrl" [name]="messageServiceUrl.source"></app-spring-health>
+  </div>
   <app-message-list></app-message-list>
 </div>

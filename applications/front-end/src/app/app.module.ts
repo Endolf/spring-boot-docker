@@ -7,11 +7,13 @@ import { AppComponent } from './app.component';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { MessageListComponent } from './message-list/message-list.component';
+import { SpringHealthComponent } from './spring-health/spring-health.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MessageListComponent
+    MessageListComponent,
+    SpringHealthComponent
   ],
   imports: [
     BrowserModule,
