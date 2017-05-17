@@ -1,1 +1,0 @@
-CREATE KEYSPACE IF NOT EXISTS test WITH durable_writes = true AND replication = { 'replication_factor' : 1, 'class' : 'SimpleStrategy' };
