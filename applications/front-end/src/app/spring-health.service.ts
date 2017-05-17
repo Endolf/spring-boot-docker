@@ -9,15 +9,15 @@ export class SpringHealthService {
 
   public getSpringHealth(url: string): Observable<SpringHealthAggregate> {
     return this.http.get(url)
-      .map(SpringHealthAggregate.convertFromResponse)
-      .catch(this.handleError);
+      .map(this.convertFromResponse)
+      .catch(this.handleError.bind(this, this));
   }
 
-  private handleError(error: Response | any) {
+  private handleError(service: SpringHealthService, error: Response | any) {
     let errMsg;
     if (error instanceof Response) {
       if(error.status===503) {
-        return Observable.from([SpringHealthAggregate.convertFromResponse(error)]);
+        return Observable.from([service.convertFromResponse(error)]);
       } else {
         errMsg = `${error.status} - ${error.statusText || ''} ${error}`;
       }
@@ -26,12 +26,8 @@ export class SpringHealthService {
     }
     return Observable.throw(errMsg);
   }
-}
 
-export class SpringHealthAggregate {
-  constructor(public status, public healthItems: SpringHealth[]) {}
-
-  public static convertFromResponse(response: Response): SpringHealthAggregate {
+  private convertFromResponse(response: Response): SpringHealthAggregate {
     let body = response.json();
     return new SpringHealthAggregate(body.status,
       Object.getOwnPropertyNames(body)
@@ -42,6 +38,10 @@ export class SpringHealthAggregate {
             .filter(name => name != "error")
             .map(detail => new SpringHealthDetail(detail, body[healthItem][detail])))));
   }
+}
+
+export class SpringHealthAggregate {
+  constructor(public status, public healthItems: SpringHealth[]) {}
 }
 
 export class SpringHealth {
