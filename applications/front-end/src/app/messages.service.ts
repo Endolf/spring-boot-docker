@@ -13,7 +13,7 @@ import 'rxjs/add/observable/defer';
 @Injectable()
 export class MessagesService {
 
-  private messages: Message[] = environment.production?[]:[
+  private messages: Message[] = environment.production||environment.messageServiceURLs.length!=0?[]:[
     {
       source: "mongo",
       timestamp : "2017-05-13T15:50:54.502Z",
@@ -91,20 +91,25 @@ export class MessagesService {
         }, error => {
           lastError = error;
           completed[index] = true;
+          this.handleMessageServiceCompletion(completed, lastError, observer);
         }, () => {
           completed[index] = true;
-          if(completed.every(item => item===true)) {
-            if(lastError==null) {
-              observer.complete();
-            } else {
-              console.warn("Error getting messages", lastError);
-              observer.error(lastError);
-            }
-          }
+          this.handleMessageServiceCompletion(completed, lastError, observer);
         }));
       });
     }
     return retval;
+  }
+
+  private handleMessageServiceCompletion(completed: boolean[], lastError, observer) {
+    if (completed.every(item => item === true)) {
+      if (lastError == null) {
+        observer.complete();
+      } else {
+        console.warn("Error getting messages", lastError);
+        observer.error(lastError);
+      }
+    }
   }
 
   private handleError (error: Response | any) {
