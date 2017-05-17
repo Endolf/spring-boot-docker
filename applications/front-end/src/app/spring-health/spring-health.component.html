@@ -8,5 +8,5 @@
 </ng-template>
 <!--triggers="mouseenter:mouseleave"-->
 <div class="p-2 spring-health-status-{{(status || 'unknown').toLowerCase()}}" [ngbPopover]="popContent" placement="bottom">
-  {{name}}: {{status}}
+  {{name}}: {{status || 'loading...'}}
 </div>

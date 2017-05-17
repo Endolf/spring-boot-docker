@@ -1,5 +1,5 @@
-import {Component, HostListener, Input, OnInit} from '@angular/core';
-import {SpringHealth, SpringHealthDetail, SpringHealthService} from "../spring-health.service";
+import {Component, Input, OnInit} from '@angular/core';
+import {SpringHealth, SpringHealthService} from "../spring-health.service";
 
 @Component({
   selector: 'app-spring-health',
@@ -23,7 +23,7 @@ export class SpringHealthComponent implements OnInit {
       console.log("Got health", healthItem);
       this.status = healthItem.status;
       this.health = healthItem.healthItems;
-    }, error=>{
+    }, error=> {
       console.log("Got error", error);
       this.status = "DOWN";
       this.errorMessage = error;
