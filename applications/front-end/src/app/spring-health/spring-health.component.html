@@ -1,12 +1,14 @@
 <ng-template #popContent>
-  <div *ngFor="let item of health" class="p-2 spring-health-status-{{(item.status || 'unknown').toLowerCase()}} container">
-    {{item.name}}: {{item.status}}
-    <div *ngFor="let detail of item.details" class="offset-2">
-      {{detail.name}}: {{detail.value}}
+  <div class="p-2 container">
+    <div *ngFor="let item of health" class="p-2 spring-health-status-{{(item.status || 'unknown').toLowerCase()}}">
+      {{item.name}}: {{item.status}}
+      <div *ngFor="let detail of item.details" class="offset-2">
+        {{detail.name}}: {{detail.value}}
+      </div>
     </div>
+    <div *ngIf="!health || health.length<1" class="text-center">No details</div>
   </div>
 </ng-template>
-<!--triggers="mouseenter:mouseleave"-->
-<div class="p-2 spring-health-status-{{(status || 'unknown').toLowerCase()}}" [ngbPopover]="popContent" placement="bottom">
+<div class="p-2 spring-health-status-{{(status || 'unknown').toLowerCase()}}" [ngbPopover]="popContent" placement="bottom" triggers="mouseenter:mouseleave">
   {{name}}: {{status || 'loading...'}}
 </div>
