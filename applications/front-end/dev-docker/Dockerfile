@@ -1,4 +1,4 @@
-FROM node:6.10
+FROM node:6.10-alpine
 VOLUME /tmp
 
 RUN ["sh", "-c", "npm install -g @angular/cli"]

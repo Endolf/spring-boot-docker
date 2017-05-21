@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk:8-alpine
 VOLUME /tmp
 ADD @project.artifactId@-@project.version@.@project.packaging@ /@project.artifactId@/@project.artifactId@-@project.version@.@project.packaging@
 ENV JAVA_OPTS=""
