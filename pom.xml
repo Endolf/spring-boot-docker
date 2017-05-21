@@ -170,7 +170,6 @@
                 </executions>
                 <configuration>
                     <onlyAnalyze>com.computerbooth.-</onlyAnalyze>
-                    <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
                     <!-- Enables analysis which takes more memory but finds more bugs. If
                     you run out of memory, changes the value of the effort element to 'Low'. -->
                     <effort>Max</effort>
@@ -186,16 +185,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>${maven-pmd-plugin.version}</version>
-                <configuration>
-                    <rulesets>
-                        <!-- This is the default ruleset with some exclusions -->
-                        <ruleset>/rulesets/java/basic.xml</ruleset>
-                        <ruleset>/rulesets/java/empty.xml</ruleset>
-                        <ruleset>/rulesets/java/imports.xml</ruleset>
-                        <ruleset>/rulesets/java/unusedcode.xml</ruleset>
-                        <ruleset>/rulesets/java/unnecessary.xml</ruleset>
-                    </rulesets>
-                </configuration>
                 <executions>
                     <execution>
                         <phase>test</phase>
