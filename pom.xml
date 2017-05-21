@@ -87,11 +87,6 @@
                     <artifactId>maven-source-plugin</artifactId>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>${findbugs-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>${maven-release-plugin.version}</version>
                 </plugin>
@@ -153,49 +148,48 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- FindBugs Static Analysis -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>${findbugs-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <onlyAnalyze>com.computerbooth.-</onlyAnalyze>
+                        <!-- Enables analysis which takes more memory but finds more bugs. If
+                        you run out of memory, changes the value of the effort element to 'Low'. -->
+                        <effort>Max</effort>
+                        <!-- Build fails if problems are found -->
+                        <failOnError>true</failOnError>
+                        <!-- Reports all bugs (other values are medium and max) -->
+                        <threshold>Low</threshold>
+                        <!-- Produces XML report -->
+                        <xmlOutput>true</xmlOutput>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>${maven-pmd-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>check</goal>
+                                <!-- Finding duplicate code with PMD's Copy/Paste Detector (CPD) tool. -->
+                                <goal>cpd-check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <!-- FindBugs Static Analysis -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <onlyAnalyze>com.computerbooth.-</onlyAnalyze>
-                    <!-- Enables analysis which takes more memory but finds more bugs. If
-                    you run out of memory, changes the value of the effort element to 'Low'. -->
-                    <effort>Max</effort>
-                    <!-- Build fails if problems are found -->
-                    <failOnError>true</failOnError>
-                    <!-- Reports all bugs (other values are medium and max) -->
-                    <threshold>Low</threshold>
-                    <!-- Produces XML report -->
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>check</goal>
-                            <!-- Finding duplicate code with PMD's Copy/Paste Detector (CPD) tool. -->
-                            <goal>cpd-check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 </project>
