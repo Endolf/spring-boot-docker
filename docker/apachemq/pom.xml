@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
 
-    <artifactId>apache-mq</artifactId>
+    <artifactId>apachemq</artifactId>
 
     <parent>
         <groupId>com.computerbooth.kubernetes-poc</groupId>

@@ -1,6 +1,6 @@
 package com.computerbooth.test;
 
-import com.computerbooth.test.SIConfiguration.AMQPEndpoint;
+import com.computerbooth.test.SIConfiguration.MessagingAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +17,14 @@ import java.time.Instant;
 @Component
 public class ApplicationStartupListener implements ApplicationListener<ApplicationReadyEvent> {
     private final Logger logger = LoggerFactory.getLogger(ApplicationStartupListener.class);
-    private AMQPEndpoint amqpEndpoint;
+    private MessagingAdapter messagingAdapter;
 
     @Value("${spring.application.name}")
     private String name;
 
     @Autowired
-    public void setAMQPEndpoint(AMQPEndpoint gateway) {
-        this.amqpEndpoint = gateway;
+    public void setAMQPEndpoint(MessagingAdapter messagingAdapter) {
+        this.messagingAdapter = messagingAdapter;
     }
 
     @Override
@@ -44,6 +44,6 @@ public class ApplicationStartupListener implements ApplicationListener<Applicati
         String messageText = messageTextBuilder.toString();
         logger.info(messageText);
         Message message = new Message(Instant.now(), messageText);
-        amqpEndpoint.sendToQueue(message);
+        messagingAdapter.sendMessage(message);
     }
 }

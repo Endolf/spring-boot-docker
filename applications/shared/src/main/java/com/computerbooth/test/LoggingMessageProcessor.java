@@ -15,7 +15,7 @@ public class LoggingMessageProcessor {
     @Bean
     @ConditionalOnProperty(name="spring.application.name", havingValue = "Core test application")
     public IntegrationFlow processMessage() {
-        return IntegrationFlows.from("amqpInboundChannel")
+        return IntegrationFlows.from("jmsInboundChannel")
                 .handle(message -> logger.info("Processed message: {}", message.getPayload()))
                 .get();
     }

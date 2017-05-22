@@ -1,15 +1,6 @@
 package com.computerbooth.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.support.converter.ContentTypeDelegatingMessageConverter;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +10,13 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.amqp.Amqp;
+import org.springframework.integration.dsl.jms.Jms;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.messaging.MessageChannel;
+
+import javax.jms.ConnectionFactory;
 
 @Configuration
 @EnableIntegration
@@ -39,53 +35,42 @@ public class SIConfiguration {
     @Autowired
     public MessageConverter messageConverter(ObjectMapper objectMapper){
         objectMapper.findAndRegisterModules();
-        ContentTypeDelegatingMessageConverter converter = new ContentTypeDelegatingMessageConverter();
-        converter.addDelegate("application/json", new Jackson2JsonMessageConverter(objectMapper));
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        converter.setObjectMapper(objectMapper);
         return converter;
     }
 
     @Bean
-    public TopicExchange topicExchange() {
-        return new TopicExchange(mqExchangeName);
-    }
-
-    @Bean
-    public Queue inboundQueue() {
-        return new Queue(mqExchangeName + "." + mqRoutingKey + "." + name);
-    }
-
-    @Bean
-    public Binding binding() {
-        return BindingBuilder.bind(inboundQueue()).to(topicExchange()).with(mqRoutingKey);
-    }
-
-    @Bean
     @Autowired
-    public IntegrationFlow amqpOutbound(AmqpTemplate amqpTemplate) {
-        return IntegrationFlows.from(amqpOutboundChannel())
+    public IntegrationFlow jmsOutbound(JmsTemplate template) {
+        return IntegrationFlows.from(jmsOutboundChannel())
                 .enrichHeaders(h -> h.header("contentType", "application/json"))
-                .handle(Amqp.outboundAdapter(amqpTemplate)
-                        .exchangeName(mqExchangeName)
-                        .routingKey(mqRoutingKey))
+                .handle(Jms.outboundAdapter(template)
+                        .destination("test"))
                 .get();
     }
 
     @Bean
-    public MessageChannel amqpOutboundChannel() {
+    public MessageChannel jmsOutboundChannel() {
         return new DirectChannel();
     }
 
-    @MessagingGateway(defaultRequestChannel = "amqpOutboundChannel")
-    public interface AMQPEndpoint {
-        void sendToQueue(Message data);
+    @MessagingGateway(defaultRequestChannel = "jmsOutboundChannel")
+    public interface MessagingAdapter {
+        void sendMessage(Message data);
+    }
+
+    @Bean
+    public IntegrationFlow errorHandler() {
+        return IntegrationFlows.from("errorChannel").log().get();
     }
 
     @Bean
     @Autowired
-    public IntegrationFlow amqpInbound(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
-        return IntegrationFlows.from(Amqp.inboundAdapter(connectionFactory, inboundQueue())
-                    .messageConverter(messageConverter))
-                .channel("amqpInboundChannel")
+    public IntegrationFlow jmsInbound(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
+        return IntegrationFlows.from(Jms.messageDrivenChannelAdapter(connectionFactory)
+                    .destination("test").jmsMessageConverter(messageConverter).errorChannel("errorChannel"))
+                .channel("jmsInboundChannel")
                 .get();
     }
 }

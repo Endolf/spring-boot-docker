@@ -20,7 +20,7 @@ public class MessageProcessor {
 
     @Bean
     public IntegrationFlow processMessage() {
-        return IntegrationFlows.from("amqpInboundChannel")
+        return IntegrationFlows.from("jmsInboundChannel")
                 .<com.computerbooth.test.Message, Message>transform(Message::new)
                 .<Message>handle((payload, headers) -> repository.save(payload))
                 .handle(message -> logger.info("Processed message: {}", message.getPayload()))

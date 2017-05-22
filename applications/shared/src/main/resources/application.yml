@@ -1,8 +1,9 @@
 spring:
   application.name: "Core test application"
-
-  rabbitmq:
-    host: localhost
-    port: 5672
+  artemis:
+    host: 172.17.0.2
+    port: 61616
+    user: user
+    password: secret
 
 management.security.enabled: false
