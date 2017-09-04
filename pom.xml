@@ -24,7 +24,6 @@
 
     <modules>
         <module>applications</module>
-        <module>docker</module>
         <module>kubernetes</module>
     </modules>
 
