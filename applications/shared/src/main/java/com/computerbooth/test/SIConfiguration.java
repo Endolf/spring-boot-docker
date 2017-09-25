@@ -22,6 +22,8 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.amqp.Amqp;
 import org.springframework.messaging.MessageChannel;
 
+import javax.jms.ConnectionFactory;
+
 @Configuration
 @EnableIntegration
 public class SIConfiguration {
