@@ -96,15 +96,18 @@
                     <version>${maven-release-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
                     <groupId>com.spotify</groupId>
-                    <artifactId>docker-maven-plugin</artifactId>
-                    <version>0.4.11</version>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>1.3.6</version>
                     <configuration>
-                        <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                        <imageTags>
-                            <imageTag>${project.version}</imageTag>
-                        </imageTags>
-                        <dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
+                        <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                        <tag>${project.version}</tag>
+                        <contextDirectory>target</contextDirectory>
                     </configuration>
                     <executions>
                         <execution>
@@ -115,6 +118,19 @@
                             </goals>
                         </execution>
                     </executions>
+                    <!-- Fixes an issue in the plexus archiver, should be resolved at some point -->
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-archiver</artifactId>
+                            <version>3.4</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>javax.activation</groupId>
+                            <artifactId>javax.activation-api</artifactId>
+                            <version>1.2.0</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
