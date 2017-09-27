@@ -48,6 +48,7 @@
                     <configuration>
                       <repository>${docker.image.prefix}/${project.artifactId}-dev</repository>
                       <contextDirectory>${project.basedir}/dev-docker</contextDirectory>
+                      <tag>latest</tag>
                     </configuration>
                   </execution>
                   <execution>
@@ -58,7 +59,6 @@
                     </goals>
                     <configuration>
                       <repository>${docker.image.prefix}/${project.artifactId}</repository>
-                      <tag>${project.version}</tag>
                       <contextDirectory>${project.build.directory}</contextDirectory>
                     </configuration>
                   </execution>
