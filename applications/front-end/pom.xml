@@ -47,7 +47,6 @@
                     </goals>
                     <configuration>
                       <repository>${docker.image.prefix}/${project.artifactId}-dev</repository>
-                      <tag>${project.version}</tag>
                       <contextDirectory>${project.basedir}/dev-docker</contextDirectory>
                     </configuration>
                   </execution>
